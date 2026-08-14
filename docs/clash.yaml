@@ -1,17 +1,14 @@
 mixed-port: 7890
-allow-lan: false
+allow-lan: true
 bind-address: '*'
 mode: rule
 log-level: info
-ipv6: false
+ipv6: true
+unified-delay: true
+tcp-concurrent: true
+global-client-fingerprint: chrome
 external-controller: 127.0.0.1:9090
 proxies:
-- cipher: aes-128-gcm
-  name: jp|d00a|puddincat07@Telegram
-  password: shadowsocks
-  port: 443
-  server: 149.22.87.204
-  type: ss
 - name: 🇭🇰 香港 | HKG 3
   server: 202.146.222.89
   port: 443
@@ -82,18 +79,6 @@ proxies:
     headers:
       Host: royal-salad-175d.306.workers.dev
   udp: true
-- name: 🇺🇸 美国 | USA 41
-  server: 104.18.34.245
-  port: 8880
-  type: vless
-  uuid: 78b73cc4-8c3c-40ce-bb74-d5dcd3277c67
-  tls: false
-  network: ws
-  ws-opts:
-    path: /pyip=ProxyIP.JP.CMLiussss.net
-    headers:
-      Host: white-hill-f907.23-b68.workers.dev
-  udp: true
 - name: 🇺🇸 美国 | USA 16
   server: pg-usa2-bot.gigatapbot.top
   port: 47822
@@ -121,6 +106,18 @@ proxies:
   servername: pg-usa2-443-vless-tcp.gigatapbot.top
   client-fingerprint: firefox
   network: tcp
+  udp: true
+- name: 🇺🇸 美国 | USA 41
+  server: 104.18.34.245
+  port: 8880
+  type: vless
+  uuid: 78b73cc4-8c3c-40ce-bb74-d5dcd3277c67
+  tls: false
+  network: ws
+  ws-opts:
+    path: /pyip=ProxyIP.JP.CMLiussss.net
+    headers:
+      Host: white-hill-f907.23-b68.workers.dev
   udp: true
 - name: 🇺🇸 美国 | USA 6
   server: 104.20.37.53
@@ -314,13 +311,13 @@ proxies:
     headers:
       Host: neth.lckdwn.ru
   udp: true
-- name: 🇩🇿 DZ_10
-  server: 85.204.107.164
+- name: 🇳🇱 荷兰 | NLD 4
+  server: 86.107.178.71
   port: 8443
   type: hysteria2
-  password: Jz40_mIJ934vK0_k9D3jz92_Vx48q_GHa1_sz0
-  auth: Jz40_mIJ934vK0_k9D3jz92_Vx48q_GHa1_sz0
-  sni: grape-zet-ro-turbo.bumbleshrimp.com
+  password: Oz_Kx9342gefwJ89x3_M9z32kzf9KJq003_s
+  auth: Oz_Kx9342gefwJ89x3_M9z32kzf9KJq003_s
+  sni: grape-zet-turbo-nl.yyuyy.com
   skip-cert-verify: true
 - name: 🇱🇹 立陶宛 | LTU
   server: 84.32.209.80
@@ -346,6 +343,20 @@ proxies:
     public-key: rkRBWVPGbMdh1UXAMu0I019NbBFWoBh4W1T856oyl2o
     short-id: bbab5af2663db00a
   servername: nl1.murhost.network
+  client-fingerprint: firefox
+  network: tcp
+  udp: true
+- name: 🇩🇪 德国 | DEU 21
+  server: veilora.orbvia.online
+  port: 443
+  type: vless
+  uuid: 80bd9045-a93a-4065-86a9-02e9401b8f73
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: c9FNVDSx_oUTDFW0JewGq511wlGweUkQGgPPY9vsCVM
+    short-id: 08804e078e1257c8
+  servername: veilora.orbvia.online
   client-fingerprint: firefox
   network: tcp
   udp: true
@@ -400,15 +411,32 @@ proxies:
   skip-cert-verify: true
   alpn:
   - h3
-- alterId: 2
-  cipher: auto
-  name: xx|8151|puddincat07@Telegram
-  port: 30807
-  server: v10.hdacd.com
+- cipher: chacha20-ietf-poly1305
+  name: ca|2de2|puddincat07@Telegram
+  password: G5p6ww4o67HB
+  port: 8388
+  server: 108.181.118.10
+  type: ss
+- name: xx|bd39|puddincat07@Telegram
+  password: ba07a8af-5544-48ac-ab62-3b6c00a44fa6
+  port: 20004
+  server: oplosgru-c.catcat321.com
   skip-cert-verify: false
-  tls: false
-  type: vmess
-  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
+  sni: hk.catxstar.com
+  type: trojan
+- name: 🇩🇪 德国 | DEU 6
+  server: 162.35.231.6
+  port: 443
+  type: vless
+  uuid: 218fd696-e3a2-4c33-b397-a5f13a82969e
+  tls: true
+  reality-opts:
+    public-key: O4of5fbG7Ns3fBdBF0bDU8Fa8q-mdk7YLgOgvAWPeF8
+    short-id: f85aebea
+  servername: media11.abvphelp.cc
+  client-fingerprint: firefox
+  network: tcp
+  udp: true
 - name: nl|7363|puddincat07@Telegram
   password: gf1:gfhysteria2024
   port: 443
@@ -471,6 +499,15 @@ proxies:
   client-fingerprint: firefox
   network: tcp
   udp: true
+- name: xx|34c5|puddincat07@Telegram
+  password: 0010996f-3eab-4804-9b3a-3a889d6767fc
+  port: 20088
+  server: a8zbx9xj.catcat321.com
+  skip-cert-verify: true
+  sni: iepl.krz3.cat.bilibili.com
+  tls: false
+  type: trojan
+  udp: true
 - name: 🇩🇪 德国 | DEU 9
   server: srvhy1.ezcon24.online
   port: 8443
@@ -479,6 +516,12 @@ proxies:
   auth: 553e3253-c454-431d-a7e6-42bc06ea5e14
   sni: srvhy1.ezcon24.online
   skip-cert-verify: true
+- cipher: chacha20-ietf-poly1305
+  name: ru|58e4|puddincat07@Telegram
+  password: s8LbJCgUiGXeCKVc63tHJP
+  port: 64674
+  server: 94.198.220.183
+  type: ss
 - name: 🇪🇸 西班牙 | ESP 2
   server: 185.18.250.252
   port: 443
@@ -593,75 +636,18 @@ proxies:
   network: tcp
   udp: true
 proxy-groups:
-- name: PROXY
-  type: select
-  proxies:
-  - AUTO-FAST
-  - FALLBACK
-  - AI-POOL
-  - HK-POOL
-  - JP-POOL
-  - US-POOL
-  - jp|d00a|puddincat07@Telegram
-  - 🇭🇰 香港 | HKG 3
-  - 🇭🇰 香港 | HKG 5
-  - us|b395|puddincat07@Telegram
-  - us|9165|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 21
-  - 🇺🇸 美国 | USA 8
-  - 🇺🇸 美国 | USA 41
-  - 🇺🇸 美国 | USA 16
-  - 🇺🇸 美国 | USA 40
-  - 🇺🇸 美国 | USA 6
-  - us|e9fc|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 4
-  - 🇺🇸 美国 | USA 5
-  - us|4896|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 39
-  - 🇺🇸 美国 | USA 15
-  - 🇺🇸 美国 | USA 32
-  - 🇺🇸 美国 | USA 14
-  - 🇺🇸 美国 | USA 22
-  - 🇫🇷 法国 | FRA 6
-  - 🇮🇳 印度 | IND
-  - xx|8008|puddincat07@Telegram
-  - xx|0db7|puddincat07@Telegram
-  - 🇳🇱 荷兰 | NLD
-  - 🇩🇿 DZ_10
-  - 🇱🇹 立陶宛 | LTU
-  - 🇩🇪 德国 | DEU 3
-  - 🇩🇰 丹麦 | DNK
-  - 🇩🇪 德国 | DEU 5
-  - 🇩🇪 德国 | DEU 20
-  - 🇩🇪 德国 | DEU 15
-  - xx|8151|puddincat07@Telegram
-  - nl|7363|puddincat07@Telegram
-  - 🇩🇪 德国 | DEU 11
-  - 未知TROJAN-230|free-nodes
-  - 🇸🇪 瑞典 | SWE
-  - 🇬🇧 英国 | GBR 2
-  - 🇩🇪 德国 | DEU 9
-  - 🇪🇸 西班牙 | ESP 2
-  - 未知VLESS-641|free-nodes
-  - 🇳🇱 荷兰 | NLD 3
-  - 🇬🇧 英国 | GBR
-  - 🇩🇪 德国 | DEU 12
-  - 🇳🇱 荷兰 | NLD 5
-  - 🇪🇸 西班牙 | ESP
-  - 🇩🇪 德国 | DEU 10
 - name: AUTO-FAST
   type: url-test
   proxies:
-  - jp|d00a|puddincat07@Telegram
   - 🇭🇰 香港 | HKG 3
   - 🇭🇰 香港 | HKG 5
   - us|b395|puddincat07@Telegram
   - us|9165|puddincat07@Telegram
   - 🇺🇸 美国 | USA 21
   - 🇺🇸 美国 | USA 8
-  - 🇺🇸 美国 | USA 41
   - 🇺🇸 美国 | USA 16
   - 🇺🇸 美国 | USA 40
+  - 🇺🇸 美国 | USA 41
   - 🇺🇸 美国 | USA 6
   - us|e9fc|puddincat07@Telegram
   - 🇺🇸 美国 | USA 4
@@ -677,20 +663,25 @@ proxy-groups:
   - xx|8008|puddincat07@Telegram
   - xx|0db7|puddincat07@Telegram
   - 🇳🇱 荷兰 | NLD
-  - 🇩🇿 DZ_10
+  - 🇳🇱 荷兰 | NLD 4
   - 🇱🇹 立陶宛 | LTU
   - 🇩🇪 德国 | DEU 3
+  - 🇩🇪 德国 | DEU 21
   - 🇩🇰 丹麦 | DNK
   - 🇩🇪 德国 | DEU 5
   - 🇩🇪 德国 | DEU 20
   - 🇩🇪 德国 | DEU 15
-  - xx|8151|puddincat07@Telegram
+  - ca|2de2|puddincat07@Telegram
+  - xx|bd39|puddincat07@Telegram
+  - 🇩🇪 德国 | DEU 6
   - nl|7363|puddincat07@Telegram
   - 🇩🇪 德国 | DEU 11
   - 未知TROJAN-230|free-nodes
   - 🇸🇪 瑞典 | SWE
   - 🇬🇧 英国 | GBR 2
+  - xx|34c5|puddincat07@Telegram
   - 🇩🇪 德国 | DEU 9
+  - ru|58e4|puddincat07@Telegram
   - 🇪🇸 西班牙 | ESP 2
   - 未知VLESS-641|free-nodes
   - 🇳🇱 荷兰 | NLD 3
@@ -700,73 +691,24 @@ proxy-groups:
   - 🇪🇸 西班牙 | ESP
   - 🇩🇪 德国 | DEU 10
   url: http://www.gstatic.com/generate_204
-  interval: 300
-  tolerance: 50
-- name: FALLBACK
-  type: fallback
-  proxies:
-  - jp|d00a|puddincat07@Telegram
-  - 🇭🇰 香港 | HKG 3
-  - 🇭🇰 香港 | HKG 5
-  - us|b395|puddincat07@Telegram
-  - us|9165|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 21
-  - 🇺🇸 美国 | USA 8
-  - 🇺🇸 美国 | USA 41
-  - 🇺🇸 美国 | USA 16
-  - 🇺🇸 美国 | USA 40
-  - 🇺🇸 美国 | USA 6
-  - us|e9fc|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 4
-  - 🇺🇸 美国 | USA 5
-  - us|4896|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 39
-  - 🇺🇸 美国 | USA 15
-  - 🇺🇸 美国 | USA 32
-  - 🇺🇸 美国 | USA 14
-  - 🇺🇸 美国 | USA 22
-  - 🇫🇷 法国 | FRA 6
-  - 🇮🇳 印度 | IND
-  - xx|8008|puddincat07@Telegram
-  - xx|0db7|puddincat07@Telegram
-  - 🇳🇱 荷兰 | NLD
-  - 🇩🇿 DZ_10
-  - 🇱🇹 立陶宛 | LTU
-  - 🇩🇪 德国 | DEU 3
-  - 🇩🇰 丹麦 | DNK
-  - 🇩🇪 德国 | DEU 5
-  - 🇩🇪 德国 | DEU 20
-  - 🇩🇪 德国 | DEU 15
-  - xx|8151|puddincat07@Telegram
-  - nl|7363|puddincat07@Telegram
-  - 🇩🇪 德国 | DEU 11
-  - 未知TROJAN-230|free-nodes
-  - 🇸🇪 瑞典 | SWE
-  - 🇬🇧 英国 | GBR 2
-  - 🇩🇪 德国 | DEU 9
-  - 🇪🇸 西班牙 | ESP 2
-  - 未知VLESS-641|free-nodes
-  - 🇳🇱 荷兰 | NLD 3
-  - 🇬🇧 英国 | GBR
-  - 🇩🇪 德国 | DEU 12
-  - 🇳🇱 荷兰 | NLD 5
-  - 🇪🇸 西班牙 | ESP
-  - 🇩🇪 德国 | DEU 10
-  url: http://www.gstatic.com/generate_204
-  interval: 300
+  interval: 120
 - name: HK-POOL
   type: url-test
   proxies:
   - 🇭🇰 香港 | HKG 3
   - 🇭🇰 香港 | HKG 5
   url: http://www.gstatic.com/generate_204
-  interval: 300
+  interval: 120
 - name: JP-POOL
   type: url-test
   proxies:
-  - jp|d00a|puddincat07@Telegram
+  - 🇭🇰 香港 | HKG 3
+  - 🇭🇰 香港 | HKG 5
+  - us|b395|puddincat07@Telegram
+  - us|9165|puddincat07@Telegram
+  - 🇺🇸 美国 | USA 21
   url: http://www.gstatic.com/generate_204
-  interval: 300
+  interval: 120
 - name: US-POOL
   type: url-test
   proxies:
@@ -774,9 +716,9 @@ proxy-groups:
   - us|9165|puddincat07@Telegram
   - 🇺🇸 美国 | USA 21
   - 🇺🇸 美国 | USA 8
-  - 🇺🇸 美国 | USA 41
   - 🇺🇸 美国 | USA 16
   - 🇺🇸 美国 | USA 40
+  - 🇺🇸 美国 | USA 41
   - 🇺🇸 美国 | USA 6
   - us|e9fc|puddincat07@Telegram
   - 🇺🇸 美国 | USA 4
@@ -788,40 +730,37 @@ proxy-groups:
   - 🇺🇸 美国 | USA 14
   - 🇺🇸 美国 | USA 22
   url: http://www.gstatic.com/generate_204
-  interval: 300
+  interval: 120
 - name: AI-POOL
   type: url-test
   proxies:
   - 🇭🇰 香港 | HKG 3
   - 🇭🇰 香港 | HKG 5
-  - jp|d00a|puddincat07@Telegram
   - us|b395|puddincat07@Telegram
   - us|9165|puddincat07@Telegram
   - 🇺🇸 美国 | USA 21
   - 🇺🇸 美国 | USA 8
-  - 🇺🇸 美国 | USA 41
+  - 🇺🇸 美国 | USA 16
   url: http://www.gstatic.com/generate_204
-  interval: 300
+  interval: 120
+- name: FALLBACK
+  type: fallback
+  proxies:
+  - AUTO-FAST
+  - HK-POOL
+  - JP-POOL
+  - US-POOL
+  url: http://www.gstatic.com/generate_204
+  interval: 120
+- name: PROXY
+  type: select
+  proxies:
+  - AUTO-FAST
+  - FALLBACK
 rules:
 - DOMAIN-SUFFIX,openai.com,AI-POOL
 - DOMAIN-SUFFIX,chatgpt.com,AI-POOL
 - DOMAIN-SUFFIX,claude.ai,AI-POOL
 - DOMAIN-SUFFIX,anthropic.com,AI-POOL
-- DOMAIN-SUFFIX,bard.google.com,AI-POOL
-- DOMAIN-SUFFIX,google.com,PROXY
-- DOMAIN-SUFFIX,googleapis.com,PROXY
-- DOMAIN-SUFFIX,gstatic.com,PROXY
-- DOMAIN-SUFFIX,github.com,PROXY
-- DOMAIN-SUFFIX,githubusercontent.com,PROXY
-- DOMAIN-SUFFIX,cn,DIRECT
-- DOMAIN-KEYWORD,baidu,DIRECT
-- DOMAIN-KEYWORD,taobao,DIRECT
-- DOMAIN-KEYWORD,alipay,DIRECT
-- DOMAIN-KEYWORD,tmall,DIRECT
-- DOMAIN-KEYWORD,jd.com,DIRECT
-- DOMAIN-KEYWORD,bilibili,DIRECT
-- DOMAIN-KEYWORD,163.com,DIRECT
-- DOMAIN-KEYWORD,qq.com,DIRECT
-- DOMAIN-KEYWORD,weixin,DIRECT
 - GEOIP,CN,DIRECT
 - MATCH,PROXY
