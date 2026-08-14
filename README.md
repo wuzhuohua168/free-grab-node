@@ -31,27 +31,7 @@ curl -sL https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/depl
 - 同时生成 Clash、Shadowrocket、V2Ray 三种订阅格式
 - 支持全部主流代理协议（SS/SSR/VMess/VLESS/Trojan/Hysteria2/TUIC/HTTP/SOCKS5）
 - 真实代理延迟测试，精准过滤无效节点
-- GitHub Actions 每30分钟全自动更新
-
-## 订阅链接
-
-### Clash Verge / Mihomo
-
-```
-https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/clash.yaml
-```
-
-### Shadowrocket / 小火箭
-
-```
-https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/rocket.txt
-```
-
-### V2Ray / v2rayN
-
-```
-https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/v2ray.txt
-```
+- GitHub Actions 每30分钟全自动更新```
 
 在客户端中新建订阅，类型选择对应的格式，填入链接即可。
 
