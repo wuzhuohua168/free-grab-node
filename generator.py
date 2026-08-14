@@ -25,7 +25,7 @@ CLASH_OUTPUT = Path("output/clash.yaml")
 ROCKET_OUTPUT = Path("output/rocket.txt")
 TEST_URL = "http://www.gstatic.com/generate_204"
 SOURCE_TIMEOUT = 25
-LATENCY_TIMEOUT_MS = 5000
+LATENCY_TIMEOUT_MS = 6000
 MAX_RETRIES = 3
 MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "12"))
 
@@ -327,8 +327,8 @@ def benchmark_proxies(proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
 
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
     """生成Clash配置文件"""
-    # 过滤掉延迟过高的节点（超过3秒）
-    valid_metrics = [m for m in metrics if m.latency < 3000]
+    # 过滤掉延迟过高的节点（超过600ms）
+    valid_metrics = [m for m in metrics if m.latency < 600]
 
     if not valid_metrics:
         print("[WARN] 没有有效的代理节点")
@@ -680,8 +680,8 @@ def main() -> None:
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT}")
 
     # 生成Shadowrocket订阅（过滤超时节点，按健康评分排序）
-    # 只保留TCP连通成功的节点（延迟 < 5000ms）
-    valid_metrics = [m for m in metrics if m.latency < 5000]
+    # 只保留TCP连通成功的节点（延迟 < 600ms）
+    valid_metrics = [m for m in metrics if m.latency < 600]
     print(f"[INFO] TCP连通: {len(valid_metrics)}/{len(metrics)} 个节点")
 
     # 按健康评分排序，取前500个节点
