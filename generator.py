@@ -78,6 +78,11 @@ SOURCE_GROUPS = [
         "primary": "https://raw.githubusercontent.com/PuddinCat/BestClash/refs/heads/main/proxies.yaml",
         "fallbacks": [],
     },
+    {
+        "name": "zhuhaiuk free-nodes",
+        "primary": "https://raw.githubusercontent.com/zhuhaiuk/free-nodes/main/clash_config.yaml",
+        "fallbacks": [],
+    },
 ]
 
 # 支持的代理类型
