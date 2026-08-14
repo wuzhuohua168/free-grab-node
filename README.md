@@ -2,6 +2,13 @@
 
 免费代理节点自动提取和聚合系统，同时生成 Clash 和 Shadowrocket（小火箭）订阅格式。GitHub Actions 每30分钟自动更新节点源。
 
+## 核心机制
+
+- 自动下载 **mihomo（Clash Meta）** 代理引擎进行真实代理延迟测试
+- 通过代理发出 HTTP 请求验证连通性，无效节点直接丢弃
+- 按健康评分排名，仅保留 **Top 15** 高质量节点
+- 评分公式：`(1/延迟)×0.6 + 地区加成×0.3 + 稳定性×0.1`
+
 ## 功能特性
 
 - 自动从多个公开源提取免费代理节点
@@ -9,21 +16,21 @@
 - 自动地区识别（香港、日本、美国、台湾、新加坡、韩国）
 - 同时生成 Clash 和 Shadowrocket 两种订阅格式
 - 支持全部主流代理协议（SS/SSR/VMess/VLESS/Trojan/Hysteria2/TUIC/HTTP/SOCKS5）
-- AI服务智能分流
-- GitHub Actions 全自动更新
+- 真实代理延迟测试，精准过滤无效节点
+- GitHub Actions 每30分钟全自动更新
 
 ## 订阅链接
 
 ### Clash Verge / Mihomo
 
 ```
-https://wuzhuohua168.github.io/free-grab-node/clash.yaml
+https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/clash.yaml
 ```
 
 ### Shadowrocket / 小火箭
 
 ```
-https://wuzhuohua168.github.io/free-grab-node/rocket.txt
+https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/rocket.txt
 ```
 
 在 Shadowrocket 中点击右上角 + → 类型选择 **Subscribe** → URL 填入上面的链接。
