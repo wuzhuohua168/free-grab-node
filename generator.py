@@ -274,15 +274,21 @@ def detect_region(proxy: dict[str, Any]) -> str:
         return "OTHER"
 
 
-# 代理可用性测试URL（双目标验证：google + baidu，确保双向连通）
+# 代理可用性测试URL（多目标验证：google + youtube + github + baidu）
 PROXY_TEST_URLS = [
-    "https://www.google.com/generate_204",
-    "https://www.baidu.com/img/flexible/logo/pc/result.png",
+    "https://www.google.com/generate_204",            # 基础连通性
+    "https://www.youtube.com/generate_204",            # 流媒体能力
+    "https://github.com",                              # 开发用途
+    "https://www.baidu.com/img/flexible/logo/pc/result.png",  # 国内回源
 ]
 # 有效地区列表
 VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
 # 保留节点数
 TOP_N = 30
+# check-host.net 中国节点验证（免费，无需服务器）
+CHINA_CHECK_ENABLED = True
+CHINA_CHECK_MAX_NODES = 50  # 只对mihomo精测后Top50做中国验证
+CHINA_CHECK_REGIONS = ["cn", "hk"]  # 使用check-host.net的中国/香港节点
 
 
 def health_score(name: str, latency: int, region: str) -> float:
@@ -507,10 +513,10 @@ def _wait_for_controller(controller_url: str, process: subprocess.Popen[str]) ->
 
 
 def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetric | None:
-    """通过 mihomo 引擎测试单个代理节点（google 为主，baidu 为加分项）"""
+    """通过 mihomo 引擎测试单个代理节点（多目标验证，综合评分）"""
     name = str(proxy["name"])
 
-    # 主测试：google
+    # 主测试：google（必须通过）
     url = (
         f"{controller_url}/proxies/{quote(name, safe='')}/delay"
         f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URLS[0], safe='')}"
@@ -526,23 +532,28 @@ def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetri
     except Exception:
         return None
 
-    # 加分测试：baidu（通过则额外加分，不通过不影响）
-    baidu_bonus = 1.0
-    try:
-        url2 = (
-            f"{controller_url}/proxies/{quote(name, safe='')}/delay"
-            f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URLS[1], safe='')}"
-        )
-        resp2 = requests.get(url2, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
-        if resp2.status_code == 200:
-            d2 = resp2.json().get("delay", 0)
-            if 0 < d2 <= LATENCY_TIMEOUT_MS:
-                baidu_bonus = 1.2  # 双通的节点额外加分
-    except Exception:
-        pass
+    # 多目标加分测试：youtube + github + baidu（每通过一个加分，不通过不影响）
+    bonus = 1.0
+    bonus_targets = 0
+    for test_url in PROXY_TEST_URLS[1:]:
+        try:
+            url2 = (
+                f"{controller_url}/proxies/{quote(name, safe='')}/delay"
+                f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(test_url, safe='')}"
+            )
+            resp2 = requests.get(url2, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+            if resp2.status_code == 200:
+                d2 = resp2.json().get("delay", 0)
+                if 0 < d2 <= LATENCY_TIMEOUT_MS:
+                    bonus_targets += 1
+        except Exception:
+            pass
+
+    # 每通过一个额外目标 +8% 分数，最多 +24%
+    bonus = 1.0 + bonus_targets * 0.08
 
     region = detect_region(proxy)
-    score = health_score(name, latency, region) * baidu_bonus
+    score = health_score(name, latency, region) * bonus
     return ProxyMetric(proxy=proxy, latency=latency, region=region, health_score=score)
 
 
@@ -594,6 +605,176 @@ def _run_delay_tests(controller_url: str, proxies: list[dict[str, Any]]) -> list
                 print(f"[INFO] tested {completed}/{len(futures)} kept={len(metrics)}")
     metrics.sort(key=lambda m: m.health_score, reverse=True)
     print(f"[INFO] mihomo精测完成: {len(metrics)} 个节点通过")
+    return metrics
+
+
+# ---- check-host.net 中国节点 TCP 验证（免费，无需服务器） ----
+
+def _check_host_china_tcp(server: str, port: int) -> tuple[bool, int]:
+    """通过 check-host.net 免费API验证中国节点TCP连通性
+    返回 (是否通过, 通过的中国节点数)
+    """
+    if not CHINA_CHECK_ENABLED:
+        return True, 0
+
+    try:
+        # 发起检测请求
+        init_resp = requests.get(
+            "https://check-host.net/check-tcp",
+            params={"host": f"{server}:{port}", "max_nodes": 5},
+            headers={"Accept": "application/json"},
+            timeout=15,
+        )
+        if init_resp.status_code != 200:
+            return False, 0
+        data = init_resp.json()
+        request_id = data.get("request_id")
+        if not request_id:
+            return False, 0
+
+        # 等待结果（check-host.net 需要几秒完成检测）
+        time.sleep(4)
+
+        # 获取结果
+        result_resp = requests.get(
+            f"https://check-host.net/check-result/{request_id}",
+            headers={"Accept": "application/json"},
+            timeout=15,
+        )
+        if result_resp.status_code != 200:
+            return False, 0
+
+        results = result_resp.json()
+        china_passed = 0
+
+        for node_host, node_result in results.items():
+            if not isinstance(node_result, list) or not node_result:
+                continue
+            # 检查是否为中国/香港节点
+            node_lower = node_host.lower()
+            is_china_node = any(
+                region in node_lower for region in CHINA_CHECK_REGIONS
+            )
+            if not is_china_node:
+                continue
+            # 检查TCP连接是否成功
+            for r in node_result:
+                if isinstance(r, dict) and r.get("error") is None:
+                    china_passed += 1
+                    break
+
+        passed = china_passed >= 1  # 至少1个中国节点通过
+        return passed, china_passed
+
+    except Exception as e:
+        print(f"[WARN] check-host.net 验证失败 ({server}:{port}): {e}")
+        return False, 0
+
+
+def china_tcp_filter(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
+    """通过 check-host.net 中国节点TCP验证过滤节点"""
+    if not CHINA_CHECK_ENABLED:
+        return metrics
+
+    top_n = min(CHINA_CHECK_MAX_NODES, len(metrics))
+    if top_n == 0:
+        return metrics
+
+    print(f"[INFO] check-host.net 中国TCP验证: 对Top {top_n} 节点进行验证...")
+    candidates = metrics[:top_n]
+
+    verified: list[ProxyMetric] = []
+    failed = 0
+
+    for i, m in enumerate(candidates):
+        server = str(m.proxy.get("server", ""))
+        port = m.proxy.get("port", 0)
+        if not server or not port:
+            continue
+
+        passed, china_nodes = _check_host_china_tcp(server, port)
+        if passed:
+            # 通过中国验证的节点大幅加分
+            m.health_score *= 1.5
+            verified.append(m)
+            if (i + 1) % 10 == 0 or i == len(candidates) - 1:
+                print(f"[INFO] 中国TCP: {i + 1}/{len(candidates)} verified={len(verified)}")
+        else:
+            failed += 1
+        # 控制请求频率，避免被限流
+        time.sleep(0.8)
+
+    print(f"[INFO] 中国TCP验证完成: {len(verified)} 通过, {failed} 未通过")
+
+    if len(verified) >= 5:
+        # 验证通过的节点排在前面，其余节点保留作为后备
+        rest = metrics[top_n:]  # 未验证的节点
+        # 通过验证的节点排最前，未验证的按原评分排后
+        verified.sort(key=lambda m: m.health_score, reverse=True)
+        return verified + rest
+    else:
+        # 通过太少，返回原结果（不强制过滤，避免节点太少）
+        print("[WARN] 中国TCP通过节点太少，保留原评分结果")
+        return metrics
+
+
+# ---- 节点稳定性追踪（跨轮次存活加分） ----
+
+HISTORY_FILE = Path("output/node_history.json")
+
+
+def load_node_history() -> dict[str, int]:
+    """加载历史节点记录，返回 {fingerprint: 存活轮次}"""
+    if not HISTORY_FILE.exists():
+        return {}
+    try:
+        with HISTORY_FILE.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("nodes", {})
+    except Exception:
+        return {}
+
+
+def save_node_history(metrics: list[ProxyMetric]) -> None:
+    """保存当前轮次节点记录"""
+    history = load_node_history()
+    new_history: dict[str, int] = {}
+
+    for m in metrics[:TOP_N]:
+        fp = proxy_fingerprint(m.proxy)
+        prev_rounds = history.get(fp, 0)
+        new_history[fp] = min(prev_rounds + 1, 3)  # 最多记录3轮
+
+    # 历史节点衰减：之前出现过的节点如果本轮不在TopN，轮次-1
+    current_fps = {proxy_fingerprint(m.proxy) for m in metrics[:TOP_N]}
+    for fp, rounds in history.items():
+        if fp not in current_fps and rounds > 1:
+            new_history[fp] = rounds - 1
+
+    HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORY_FILE.open("w", encoding="utf-8") as f:
+        json.dump({"nodes": new_history, "updated": datetime.now(timezone.utc).isoformat()}, f, ensure_ascii=False, indent=2)
+
+
+def apply_stability_bonus(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
+    """为跨轮次稳定存活的节点加分"""
+    history = load_node_history()
+    if not history:
+        print("[INFO] 无历史节点记录，跳过稳定性加分")
+        return metrics
+
+    stable_count = 0
+    for m in metrics:
+        fp = proxy_fingerprint(m.proxy)
+        rounds = history.get(fp, 0)
+        if rounds >= 2:
+            # 存活2轮 +20%，3轮 +30%
+            bonus = 1.0 + rounds * 0.1
+            m.health_score *= bonus
+            stable_count += 1
+
+    print(f"[INFO] 稳定性加分: {stable_count} 个历史存活节点获得加分")
+    metrics.sort(key=lambda m: m.health_score, reverse=True)
     return metrics
 
 
@@ -943,6 +1124,13 @@ def main() -> None:
     # 测试节点延迟
     metrics = benchmark_proxies(proxies)
 
+    # check-host.net 中国节点TCP验证（免费，无需服务器）
+    # 对mihomo精测后的Top节点进行中国TCP二次验证，筛选从中国可连的节点
+    metrics = china_tcp_filter(metrics)
+
+    # 节点稳定性加分：跨轮次存活的节点获得额外加分
+    metrics = apply_stability_bonus(metrics)
+
     # 合并中国电信/移动线路测试结果（提升双向可通节点评分）
     metrics = merge_china_results(metrics)
 
@@ -971,6 +1159,9 @@ def main() -> None:
         f.write(rocket_content)
     print(f"[OK] V2Ray订阅已生成: {V2RAY_OUTPUT} ({len(rocket_proxies)} 节点)")
     print(f"完成时间: {datetime.now(timezone.utc).isoformat()}")
+
+    # 保存节点历史记录（用于跨轮次稳定性追踪）
+    save_node_history(metrics)
 
     # 输出统计信息
     region_stats = {}
