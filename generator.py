@@ -507,32 +507,43 @@ def _wait_for_controller(controller_url: str, process: subprocess.Popen[str]) ->
 
 
 def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetric | None:
-    """通过 mihomo 引擎测试单个代理节点（双目标验证：google + baidu）"""
+    """通过 mihomo 引擎测试单个代理节点（google 为主，baidu 为加分项）"""
     name = str(proxy["name"])
 
-    latencies = []
-    for test_url in PROXY_TEST_URLS:
-        url = (
-            f"{controller_url}/proxies/{quote(name, safe='')}/delay"
-            f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(test_url, safe='')}"
-        )
-        try:
-            response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
-            if response.status_code != 200:
-                return None
-            data = response.json()
-            latency = int(data.get("delay", 0))
-            if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
-                return None
-            latencies.append(latency)
-        except Exception:
+    # 主测试：google
+    url = (
+        f"{controller_url}/proxies/{quote(name, safe='')}/delay"
+        f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URLS[0], safe='')}"
+    )
+    try:
+        response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+        if response.status_code != 200:
             return None
+        data = response.json()
+        latency = int(data.get("delay", 0))
+        if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
+            return None
+    except Exception:
+        return None
 
-    # 双目标均通过，取平均延迟
-    avg_latency = sum(latencies) // len(latencies)
+    # 加分测试：baidu（通过则额外加分，不通过不影响）
+    baidu_bonus = 1.0
+    try:
+        url2 = (
+            f"{controller_url}/proxies/{quote(name, safe='')}/delay"
+            f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URLS[1], safe='')}"
+        )
+        resp2 = requests.get(url2, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+        if resp2.status_code == 200:
+            d2 = resp2.json().get("delay", 0)
+            if 0 < d2 <= LATENCY_TIMEOUT_MS:
+                baidu_bonus = 1.2  # 双通的节点额外加分
+    except Exception:
+        pass
+
     region = detect_region(proxy)
-    score = health_score(name, avg_latency, region)
-    return ProxyMetric(proxy=proxy, latency=avg_latency, region=region, health_score=score)
+    score = health_score(name, latency, region) * baidu_bonus
+    return ProxyMetric(proxy=proxy, latency=latency, region=region, health_score=score)
 
 
 def benchmark_proxies(proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
