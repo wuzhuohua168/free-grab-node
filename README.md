@@ -61,7 +61,10 @@ free-grab-node/
 ```
 
 ## 自动更新
-
+- Shadowrocket: https://wuzhuohua168.github.io/free-grab-node/rocket.txt
+- Clash: https://wuzhuohua168.github.io/free-grab-node/clash.yaml
+- V2Ray: https://wuzhuohua168.github.io/free-grab-node/v2ray.txt
+  
 GitHub Actions 每30分钟自动运行，流程：
 
 1. 从各节点源获取最新节点
