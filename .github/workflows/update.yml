@@ -42,10 +42,17 @@ jobs:
           cp output/v2ray.txt docs/v2ray.txt
           touch docs/.nojekyll
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Update proxy subscriptions"
-          file_pattern: 'output/* docs/* deploy/results.json'
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/clash.yaml output/rocket.txt output/v2ray.txt docs/clash.yaml docs/rocket.txt docs/v2ray.txt docs/.nojekyll
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update proxy subscriptions"
+            git push
+          fi
 
       - name: Validate configuration
         run: |
