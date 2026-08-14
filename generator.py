@@ -293,6 +293,48 @@ def health_score(name: str, latency: int, region: str) -> float:
 
 # ---- Mihomo 代理引擎测试 ----
 
+def _tcp_quick_test(proxy: dict[str, Any]) -> tuple[dict[str, Any], int] | None:
+    """快速TCP连通性测试（3秒超时，用于粗筛）"""
+    server = str(proxy.get("server", ""))
+    port = proxy.get("port", 0)
+    if not server or not port:
+        return None
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(3.0)
+        start = time.time()
+        sock.connect((server, port))
+        latency = int((time.time() - start) * 1000)
+        sock.close()
+        if latency == 0 or latency > 800:  # CDN或超慢节点
+            return None
+        return (proxy, latency)
+    except Exception:
+        return None
+
+
+def tcp_prescreen(proxies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """TCP快速粗筛，大幅减少需要 mihomo 精测的节点数"""
+    if len(proxies) <= 300:
+        return proxies
+
+    print(f"[INFO] TCP快速粗筛 {len(proxies)} 个节点...")
+    passed: list[dict[str, Any]] = []
+    workers = max(1, min(MAX_WORKERS, len(proxies)))
+
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = {executor.submit(_tcp_quick_test, p): p for p in proxies}
+        for completed, future in enumerate(as_completed(futures), start=1):
+            result = future.result()
+            if result:
+                passed.append(result[0])
+            if completed % 200 == 0 or completed == len(futures):
+                print(f"[INFO] TCP粗筛: {completed}/{len(futures)} passed={len(passed)}")
+
+    print(f"[INFO] TCP粗筛完成: {len(passed)}/{len(proxies)} 进入mihomo精测")
+    return passed
+
+
 def find_free_port() -> int:
     """找一个空闲端口"""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -837,6 +879,9 @@ def main() -> None:
     if not proxies:
         print("[ERROR] 没有找到任何代理节点")
         return
+
+    # TCP快速粗筛，减少进入mihomo精测的节点数
+    proxies = tcp_prescreen(proxies)
 
     # 测试节点延迟
     metrics = benchmark_proxies(proxies)
