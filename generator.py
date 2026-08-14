@@ -288,7 +288,6 @@ TOP_N = 30
 # check-host.net 中国节点验证（免费，无需服务器）
 CHINA_CHECK_ENABLED = True
 CHINA_CHECK_MAX_NODES = 50  # 只对mihomo精测后Top50做中国验证
-CHINA_CHECK_REGIONS = ["cn", "hk"]  # 使用check-host.net的中国/香港节点
 
 
 def health_score(name: str, latency: int, region: str) -> float:
@@ -610,18 +609,22 @@ def _run_delay_tests(controller_url: str, proxies: list[dict[str, Any]]) -> list
 
 # ---- check-host.net 中国节点 TCP 验证（免费，无需服务器） ----
 
+# check-host.net 中国节点TCP验证
+CHINA_CHECK_REGIONS = {"cn", "hk", "tw", "sg", "jp", "kr"}  # 亚太节点（GFW上游，接近中国网络环境）
+
+
 def _check_host_china_tcp(server: str, port: int) -> tuple[bool, int]:
-    """通过 check-host.net 免费API验证中国节点TCP连通性
-    返回 (是否通过, 通过的中国节点数)
+    """通过 check-host.net 免费API验证中国/亚太节点TCP连通性
+    返回 (是否通过, 通过的亚太节点数)
     """
     if not CHINA_CHECK_ENABLED:
         return True, 0
 
     try:
-        # 发起检测请求
+        # 发起检测请求，max_nodes=10 增加命中中国节点的概率
         init_resp = requests.get(
             "https://check-host.net/check-tcp",
-            params={"host": f"{server}:{port}", "max_nodes": 5},
+            params={"host": f"{server}:{port}", "max_nodes": 10},
             headers={"Accept": "application/json"},
             timeout=15,
         )
@@ -632,7 +635,11 @@ def _check_host_china_tcp(server: str, port: int) -> tuple[bool, int]:
         if not request_id:
             return False, 0
 
-        # 等待结果（check-host.net 需要几秒完成检测）
+        # 从 init 响应中读取节点国家代码（hostname 不含国家信息）
+        # 格式: {"sg1.node.check-host.net": ["sg", "Singapore", ...], ...}
+        nodes_info = data.get("nodes", {})
+
+        # 等待结果
         time.sleep(4)
 
         # 获取结果
@@ -650,20 +657,20 @@ def _check_host_china_tcp(server: str, port: int) -> tuple[bool, int]:
         for node_host, node_result in results.items():
             if not isinstance(node_result, list) or not node_result:
                 continue
-            # 检查是否为中国/香港节点
-            node_lower = node_host.lower()
-            is_china_node = any(
-                region in node_lower for region in CHINA_CHECK_REGIONS
-            )
-            if not is_china_node:
+            # 用 init 响应中的国家代码判断是否为中国/亚太节点
+            node_meta = nodes_info.get(node_host)
+            if not node_meta or not isinstance(node_meta, list) or len(node_meta) == 0:
                 continue
-            # 检查TCP连接是否成功
+            country_code = str(node_meta[0]).lower()
+            if country_code not in CHINA_CHECK_REGIONS:
+                continue
+            # 检查TCP连接是否成功（成功: {"address": "x.x.x.x", "time": 0.004}）
             for r in node_result:
                 if isinstance(r, dict) and r.get("error") is None:
                     china_passed += 1
                     break
 
-        passed = china_passed >= 1  # 至少1个中国节点通过
+        passed = china_passed >= 1  # 至少1个亚太节点通过
         return passed, china_passed
 
     except Exception as e:
@@ -672,7 +679,7 @@ def _check_host_china_tcp(server: str, port: int) -> tuple[bool, int]:
 
 
 def china_tcp_filter(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
-    """通过 check-host.net 中国节点TCP验证过滤节点"""
+    """通过 check-host.net 中国/亚太节点TCP验证过滤节点（硬过滤）"""
     if not CHINA_CHECK_ENABLED:
         return metrics
 
@@ -706,15 +713,18 @@ def china_tcp_filter(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
 
     print(f"[INFO] 中国TCP验证完成: {len(verified)} 通过, {failed} 未通过")
 
-    if len(verified) >= 5:
-        # 验证通过的节点排在前面，其余节点保留作为后备
-        rest = metrics[top_n:]  # 未验证的节点
-        # 通过验证的节点排最前，未验证的按原评分排后
+    # 硬过滤：只保留通过中国验证的节点，不凑数
+    # 未进入Top N的节点保留（它们没被验证过，作为后备）
+    rest = metrics[top_n:]
+
+    if verified:
         verified.sort(key=lambda m: m.health_score, reverse=True)
-        return verified + rest
+        result = verified + rest
+        print(f"[INFO] 中国TCP硬过滤: 验证通过 {len(verified)} + 未验证后备 {len(rest)} = 共 {len(result)} 节点")
+        return result
     else:
-        # 通过太少，返回原结果（不强制过滤，避免节点太少）
-        print("[WARN] 中国TCP通过节点太少，保留原评分结果")
+        # 全部未通过验证，返回原结果（但标记警告）
+        print("[WARN] 中国TCP验证全部未通过，保留原mihomo结果（节点质量可能较差）")
         return metrics
 
 
