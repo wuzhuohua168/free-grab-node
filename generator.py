@@ -10,13 +10,13 @@ import hashlib
 import json
 import os
 import re
+import socket
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
 import requests
 import yaml
 
@@ -265,12 +265,17 @@ def detect_region(proxy: dict[str, Any]) -> str:
 
 
 def test_proxy_delay(proxy: dict[str, Any]) -> int:
-    """测试代理节点延迟"""
+    """测试代理节点TCP连通性"""
+    server = str(proxy.get("server", ""))
+    port = proxy.get("port", 0)
     try:
-        # 简化的延迟测试，实际项目中应使用Clash内核进行真实测试
-        # 这里使用随机延迟模拟（实际部署时需要安装Mihomo/Clash内核）
-        import random
-        return random.randint(100, 2000)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5.0)
+        start = time.time()
+        sock.connect((server, port))
+        latency = int((time.time() - start) * 1000)
+        sock.close()
+        return latency
     except Exception:
         return 9999
 
@@ -451,31 +456,27 @@ def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
     return config
 
 
-def _encode_name(name: str) -> str:
-    """URL 编码节点名，保证 Shadowrocket 能正确识别中文等特殊字符"""
-    return quote(name, safe="")
-
 def proxy_to_uri(proxy: dict[str, Any]) -> str:
     """将代理节点转换为 Shadowrocket URI 格式"""
     proxy_type = str(proxy.get("type", "")).lower().strip()
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
-    name = _encode_name(str(proxy.get("name", "")))
+    name = str(proxy.get("name", ""))
 
     if proxy_type == "ss":
-        return _ss_to_uri(proxy, name)
+        return _ss_to_uri(proxy)
     elif proxy_type == "ssr":
-        return _ssr_to_uri(proxy, name)
+        return _ssr_to_uri(proxy)
     elif proxy_type == "vmess":
-        return _vmess_to_uri(proxy, name)
+        return _vmess_to_uri(proxy)
     elif proxy_type == "vless":
-        return _vless_to_uri(proxy, name)
+        return _vless_to_uri(proxy)
     elif proxy_type == "trojan":
-        return _trojan_to_uri(proxy, name)
+        return _trojan_to_uri(proxy)
     elif proxy_type in ("hysteria", "hysteria2", "hy2"):
-        return _hysteria_to_uri(proxy, name)
+        return _hysteria_to_uri(proxy)
     elif proxy_type == "tuic":
-        return _tuic_to_uri(proxy, name)
+        return _tuic_to_uri(proxy)
     elif proxy_type == "http":
         username = proxy.get("username", "")
         password = proxy.get("password", "")
@@ -489,19 +490,20 @@ def proxy_to_uri(proxy: dict[str, Any]) -> str:
     return ""
 
 
-def _ss_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _ss_to_uri(proxy: dict[str, Any]) -> str:
     """Shadowsocks -> ss:// URI"""
     cipher = str(proxy.get("cipher", "aes-256-gcm"))
     password = str(proxy.get("password", ""))
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
+    name = str(proxy.get("name", ""))
 
-    # ss://base64(method:password)@server:port#name
-    userinfo = base64.b64encode(f"{cipher}:{password}".encode()).decode()
+    # ss://base64(method:password)@server:port
+    userinfo = base64.b64encode(f"{cipher}:{password}".encode()).decode().rstrip("=")
     return f"ss://{userinfo}@{server}:{port}#{name}"
 
 
-def _ssr_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _ssr_to_uri(proxy: dict[str, Any]) -> str:
     """ShadowsocksR -> ssr:// URI"""
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
@@ -509,9 +511,10 @@ def _ssr_to_uri(proxy: dict[str, Any], name: str) -> str:
     method = str(proxy.get("cipher", "aes-256-cfb"))
     obfs = str(proxy.get("obfs", "plain"))
     password = str(proxy.get("password", ""))
+    name = str(proxy.get("name", ""))
 
     # ssr://base64(server:port:protocol:method:obfs:base64pass/?params)
-    pass_b64 = base64.b64encode(password.encode()).decode()
+    pass_b64 = base64.b64encode(password.encode()).decode().rstrip("=")
     obfs_param = str(proxy.get("obfs-param", ""))
     protocol_param = str(proxy.get("protocol-param", ""))
 
@@ -520,36 +523,20 @@ def _ssr_to_uri(proxy: dict[str, Any], name: str) -> str:
         query.append(f"obfs-param={obfs_param}")
     if protocol_param:
         query.append(f"protocol-param={protocol_param}")
+    if name:
+        query.append(f"group={name}")
     query_str = "?" + "&".join(query) if query else ""
 
     main = f"{server}:{port}:{protocol}:{method}:{obfs}:{pass_b64}/{query_str}"
-    return "ssr://" + base64.b64encode(main.encode()).decode()
+    return "ssr://" + base64.b64encode(main.encode()).decode().rstrip("=")
 
 
-def _vmess_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _vmess_to_uri(proxy: dict[str, Any]) -> str:
     """VMess -> vmess:// URI"""
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
     uuid = str(proxy.get("uuid", ""))
-
-    network = str(proxy.get("network", "tcp"))
-    tls = str(proxy.get("tls", ""))
-
-    # 从 ws-opts 提取 WebSocket 参数
-    ws_opts = proxy.get("ws-opts", {})
-    ws_path = ""
-    ws_host = ""
-    if isinstance(ws_opts, dict):
-        ws_path = str(ws_opts.get("path", "/"))
-        headers = ws_opts.get("headers", {})
-        if isinstance(headers, dict):
-            ws_host = str(headers.get("Host", ""))
-
-    # 也检查直接字段
-    if not ws_path:
-        ws_path = str(proxy.get("path", "/"))
-    if not ws_host:
-        ws_host = str(proxy.get("host", ""))
+    name = str(proxy.get("name", ""))
 
     config = {
         "v": "2",
@@ -557,99 +544,74 @@ def _vmess_to_uri(proxy: dict[str, Any], name: str) -> str:
         "add": server,
         "port": str(port),
         "id": uuid,
-        "aid": str(proxy.get("alterId", "0")),
+        "aid": str(proxy.get("alterId", 0)),
         "scy": str(proxy.get("cipher", "auto")),
-        "net": network,
+        "net": str(proxy.get("network", "tcp")),
         "type": str(proxy.get("type", "none")),
+        "host": str(proxy.get("host", proxy.get("ws-opts", {}).get("headers", {}).get("Host", "") if isinstance(proxy.get("ws-opts"), dict) else "")),
+        "path": str(proxy.get("path", proxy.get("ws-opts", {}).get("path", "/") if isinstance(proxy.get("ws-opts"), dict) else "/")),
+        "tls": str(proxy.get("tls", "")),
+        "sni": str(proxy.get("sni", proxy.get("servername", ""))),
+        "alpn": str(proxy.get("alpn", "")),
+        "fp": str(proxy.get("fp", proxy.get("fingerprint", ""))),
     }
-
-    # 只添加非空值字段
-    if ws_host:
-        config["host"] = ws_host
-    if ws_path and ws_path != "/":
-        config["path"] = ws_path
-    if tls and tls.lower() != "none":
-        config["tls"] = tls
-    sni = str(proxy.get("sni", proxy.get("servername", "")))
-    if sni:
-        config["sni"] = sni
-    alpn = str(proxy.get("alpn", ""))
-    if alpn:
-        config["alpn"] = alpn
-
     return "vmess://" + base64.b64encode(json.dumps(config, separators=(",", ":")).encode()).decode()
 
 
-def _vless_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _vless_to_uri(proxy: dict[str, Any]) -> str:
     """VLESS -> vless:// URI"""
     uuid = str(proxy.get("uuid", ""))
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
+    name = str(proxy.get("name", ""))
 
     params = []
-    network = proxy.get("network", "tcp")
-    tls = str(proxy.get("tls", "none"))
-    params.append(f"type={network}")
-    params.append(f"security={tls}")
-    if tls == "reality":
-        flow = proxy.get("flow", "")
-        if flow:
-            params.append(f"flow={flow}")
-        pbk = proxy.get("pbk", "")
-        if pbk:
-            params.append(f"pbk={pbk}")
-        sid = proxy.get("sid", "")
-        if sid:
-            params.append(f"sid={sid}")
-    if network == "ws":
-        ws_opts = proxy.get("ws-opts", {})
-        if isinstance(ws_opts, dict):
-            path = ws_opts.get("path", "/")
-            params.append(f"path={path}")
-            headers = ws_opts.get("headers", {})
-            if isinstance(headers, dict):
-                host = headers.get("Host", "")
-                if host:
-                    params.append(f"host={host}")
-    sni = str(proxy.get("sni", proxy.get("servername", "")))
-    if sni:
-        params.append(f"sni={sni}")
-    encryption = str(proxy.get("encryption", "none"))
-    params.append(f"encryption={encryption}")
+    params.append(f"type={proxy.get('network', 'tcp')}")
+    params.append(f"security={proxy.get('tls', 'none')}")
+    if proxy.get("tls") == "reality":
+        params.append(f"flow={proxy.get('flow', '')}")
+        params.append(f"pbk={proxy.get('pbk', '')}")
+        params.append(f"sid={proxy.get('sid', '')}")
+    if proxy.get("network") == "ws":
+        params.append(f"path={proxy.get('path', '/')}")
+        params.append(f"host={proxy.get('host', '')}")
+    if proxy.get("sni"):
+        params.append(f"sni={proxy.get('sni')}")
+    params.append(f"encryption={proxy.get('encryption', 'none')}")
+    params.append(f"fp={proxy.get('fp', proxy.get('fingerprint', ''))}")
 
     return f"vless://{uuid}@{server}:{port}?{'&'.join(params)}#{name}"
 
 
-def _trojan_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _trojan_to_uri(proxy: dict[str, Any]) -> str:
     """Trojan -> trojan:// URI"""
     password = str(proxy.get("password", ""))
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
+    name = str(proxy.get("name", ""))
 
     params = []
-    sni = str(proxy.get("sni", proxy.get("servername", "")))
-    if sni:
-        params.append(f"sni={sni}")
-    alpn = str(proxy.get("alpn", ""))
-    if alpn:
-        params.append(f"alpn={alpn}")
-    params.append("allowInsecure=1")
+    if proxy.get("sni"):
+        params.append(f"sni={proxy.get('sni')}")
+    if proxy.get("alpn"):
+        params.append(f"alpn={proxy.get('alpn')}")
+    params.append(f"allowInsecure=1")
 
     query = "?" + "&".join(params) if params else ""
     return f"trojan://{password}@{server}:{port}{query}#{name}"
 
 
-def _hysteria_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _hysteria_to_uri(proxy: dict[str, Any]) -> str:
     """Hysteria/Hysteria2 -> hysteria2:// URI"""
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
+    name = str(proxy.get("name", ""))
 
     params = []
     if proxy.get("insecure"):
         params.append("insecure=1")
-    sni = str(proxy.get("sni", proxy.get("servername", "")))
-    if sni:
-        params.append(f"sni={sni}")
+    if proxy.get("sni"):
+        params.append(f"sni={proxy.get('sni')}")
 
     query = "?" + "&".join(params) if params else ""
 
@@ -659,21 +621,19 @@ def _hysteria_to_uri(proxy: dict[str, Any], name: str) -> str:
     return f"hysteria2://{server}:{port}{query}#{name}"
 
 
-def _tuic_to_uri(proxy: dict[str, Any], name: str) -> str:
+def _tuic_to_uri(proxy: dict[str, Any]) -> str:
     """TUIC -> tuic:// URI"""
     uuid = str(proxy.get("uuid", ""))
     password = str(proxy.get("password", ""))
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
+    name = str(proxy.get("name", ""))
 
     params = []
-    cc = str(proxy.get("congestion_control", "cubic"))
-    params.append(f"congestion_control={cc}")
-    alpn = str(proxy.get("alpn", "h3"))
-    params.append(f"alpn={alpn}")
-    sni = str(proxy.get("sni", proxy.get("servername", "")))
-    if sni:
-        params.append(f"sni={sni}")
+    params.append(f"congestion_control={proxy.get('congestion_control', 'cubic')}")
+    params.append(f"alpn={proxy.get('alpn', 'h3')}")
+    if proxy.get("sni"):
+        params.append(f"sni={proxy.get('sni')}")
     params.append("allowInsecure=1")
 
     return f"tuic://{uuid}:{password}@{server}:{port}?{'&'.join(params)}#{name}"
@@ -719,12 +679,19 @@ def main() -> None:
 
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT}")
 
-    # 生成Shadowrocket订阅
-    rocket_content = generate_shadowrocket_sub(proxies)
+    # 生成Shadowrocket订阅（过滤超时节点，按健康评分排序）
+    # 只保留TCP连通成功的节点（延迟 < 5000ms）
+    valid_metrics = [m for m in metrics if m.latency < 5000]
+    print(f"[INFO] TCP连通: {len(valid_metrics)}/{len(metrics)} 个节点")
+
+    # 按健康评分排序，取前500个节点
+    valid_metrics.sort(key=lambda m: m.health_score, reverse=True)
+    rocket_proxies = [m.proxy for m in valid_metrics[:500]]
+    rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
 
-    print(f"[OK] Shadowrocket订阅已生成: {ROCKET_OUTPUT}")
+    print(f"[OK] Shadowrocket订阅已生成: {ROCKET_OUTPUT} ({len(rocket_proxies)} 节点)")
     print(f"完成时间: {datetime.now(timezone.utc).isoformat()}")
 
     # 输出统计信息
