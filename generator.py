@@ -39,7 +39,7 @@ SOURCE_TIMEOUT = 25
 LATENCY_TIMEOUT_MS = 5000
 MAX_RETRIES = 3
 MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "24"))
-MAX_CANDIDATES = int(os.getenv("FREE_PROXY_MAX_CANDIDATES", "500"))  # 限制mihomo精测节点数，过多会崩溃
+MAX_CANDIDATES = int(os.getenv("FREE_PROXY_MAX_CANDIDATES", "0"))  # 0=不限制，与原作者项目一致
 
 # 节点源配置（参考项目 + 用户推荐，多个高质量源）
 SOURCE_GROUPS = [
@@ -860,10 +860,51 @@ def apply_stability_bonus(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
     return metrics
 
 
+def select_region_diverse(metrics: list[ProxyMetric], top_n: int) -> list[ProxyMetric]:
+    """按地区多样性选择节点，确保亚洲地区有足够代表，避免 US 节点霸榜"""
+    if top_n <= 0 or len(metrics) <= top_n:
+        return list(metrics)
+
+    # 按地区分组，每组内按评分排序
+    by_region: dict[str, list[ProxyMetric]] = {}
+    for m in metrics:
+        by_region.setdefault(m.region, []).append(m)
+    for region in by_region:
+        by_region[region].sort(key=lambda m: m.health_score, reverse=True)
+
+    selected: list[ProxyMetric] = []
+    selected_names: set[str] = set()
+
+    # 优先地区配额：HK, JP, SG 各取 top 3，TW, KR 各取 top 2
+    quotas = {"HK": 3, "JP": 3, "SG": 3, "TW": 2, "KR": 2}
+    for region, quota in quotas.items():
+        for m in by_region.get(region, [])[:quota]:
+            if m.proxy["name"] not in selected_names:
+                selected.append(m)
+                selected_names.add(m.proxy["name"])
+
+    # 如果已满 top_n，截断
+    if len(selected) >= top_n:
+        selected.sort(key=lambda m: m.health_score, reverse=True)
+        return selected[:top_n]
+
+    # 剩余名额：按评分从高到低补齐（跳过已选中的）
+    remaining = [m for m in metrics if m.proxy["name"] not in selected_names]
+    remaining.sort(key=lambda m: m.health_score, reverse=True)
+    for m in remaining:
+        if len(selected) >= top_n:
+            break
+        selected.append(m)
+
+    selected.sort(key=lambda m: m.health_score, reverse=True)
+    return selected
+
+
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
-    """生成Clash配置文件"""
+    """生成Clash配置文件（输出全部通过测试的节点，与原作者一致）"""
     metrics.sort(key=lambda m: m.health_score, reverse=True)
-    valid_metrics = metrics[:TOP_N] if TOP_N > 0 else metrics
+    # Clash 输出全部通过节点，不做 TOP_N 截断（与原作者项目一致）
+    valid_metrics = metrics
 
     if not valid_metrics:
         print("[WARN] 没有有效的代理节点")
@@ -1257,8 +1298,8 @@ def main() -> None:
         yaml.safe_dump(config, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT} ({len(config.get('proxies', []))} 节点)")
 
-    # 生成Shadowrocket + V2Ray订阅
-    rocket_proxies = [m.proxy for m in metrics[:TOP_N]] if TOP_N > 0 else [m.proxy for m in metrics]
+    # 生成Shadowrocket + V2Ray订阅（地区多样性选择，避免 US 霸榜）
+    rocket_proxies = [m.proxy for m in select_region_diverse(metrics, TOP_N)] if TOP_N > 0 else [m.proxy for m in metrics]
     rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
