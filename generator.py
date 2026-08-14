@@ -274,8 +274,11 @@ def detect_region(proxy: dict[str, Any]) -> str:
         return "OTHER"
 
 
-# 代理可用性测试URL
-PROXY_TEST_URL = "https://www.google.com/generate_204"
+# 代理可用性测试URL（双目标验证：google + baidu，确保双向连通）
+PROXY_TEST_URLS = [
+    "https://www.google.com/generate_204",
+    "https://www.baidu.com/img/flexible/logo/pc/result.png",
+]
 # 有效地区列表
 VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
 # 保留节点数
@@ -283,8 +286,9 @@ TOP_N = 30
 
 
 def health_score(name: str, latency: int, region: str) -> float:
-    """计算节点健康评分（纯延迟排名，延迟越低分越高）"""
-    return 1.0 / max(latency, 1)
+    """计算节点健康评分（亚洲节点优先，延迟越低分越高）"""
+    region_bonus = 1.5 if region in {"HK", "SG", "JP", "TW"} else (1.0 if region in {"US", "KR"} else 0.5)
+    return (1.0 / max(latency, 1)) * region_bonus
 
 
 def merge_china_results(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
@@ -503,25 +507,32 @@ def _wait_for_controller(controller_url: str, process: subprocess.Popen[str]) ->
 
 
 def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetric | None:
-    """通过 mihomo 引擎测试单个代理节点"""
+    """通过 mihomo 引擎测试单个代理节点（双目标验证：google + baidu）"""
     name = str(proxy["name"])
-    url = (
-        f"{controller_url}/proxies/{quote(name, safe='')}/delay"
-        f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URL, safe='')}"
-    )
-    try:
-        response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
-        if response.status_code != 200:
+
+    latencies = []
+    for test_url in PROXY_TEST_URLS:
+        url = (
+            f"{controller_url}/proxies/{quote(name, safe='')}/delay"
+            f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(test_url, safe='')}"
+        )
+        try:
+            response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+            if response.status_code != 200:
+                return None
+            data = response.json()
+            latency = int(data.get("delay", 0))
+            if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
+                return None
+            latencies.append(latency)
+        except Exception:
             return None
-        data = response.json()
-        latency = int(data.get("delay", 0))
-        if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
-            return None
-        region = detect_region(proxy)
-        score = health_score(name, latency, region)
-        return ProxyMetric(proxy=proxy, latency=latency, region=region, health_score=score)
-    except Exception:
-        return None
+
+    # 双目标均通过，取平均延迟
+    avg_latency = sum(latencies) // len(latencies)
+    region = detect_region(proxy)
+    score = health_score(name, avg_latency, region)
+    return ProxyMetric(proxy=proxy, latency=avg_latency, region=region, health_score=score)
 
 
 def benchmark_proxies(proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
