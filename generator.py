@@ -39,6 +39,7 @@ SOURCE_TIMEOUT = 25
 LATENCY_TIMEOUT_MS = 5000
 MAX_RETRIES = 3
 MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "24"))
+MAX_CANDIDATES = int(os.getenv("FREE_PROXY_MAX_CANDIDATES", "500"))  # 限制mihomo精测节点数，过多会崩溃
 
 # 节点源配置（参考项目 + 用户推荐，多个高质量源）
 SOURCE_GROUPS = [
@@ -1159,6 +1160,11 @@ def main() -> None:
     # 收集代理节点
     total_collected, proxies = collect_proxies()
     print(f"[OK] 收集到 {total_collected} 个节点，去重后 {len(proxies)} 个")
+
+    # 限制mihomo精测节点数（过多会导致mihomo进程崩溃）
+    if MAX_CANDIDATES > 0 and len(proxies) > MAX_CANDIDATES:
+        proxies = proxies[:MAX_CANDIDATES]
+        print(f"[INFO] 节点过多，限制为 {MAX_CANDIDATES} 个进入mihomo精测")
 
     # mihomo 真实代理延迟测试
     metrics: list[ProxyMetric] = []
