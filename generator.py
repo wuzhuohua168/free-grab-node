@@ -6,17 +6,27 @@
 
 from __future__ import annotations
 import base64
+import gzip
 import hashlib
 import json
 import os
+import platform
+import random
 import re
+import shutil
 import socket
+import stat
+import subprocess
+import sys
+import tempfile
 import time
+import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 import requests
 import yaml
 
@@ -268,133 +278,234 @@ def detect_region(proxy: dict[str, Any]) -> str:
 PROXY_TEST_URL = "http://www.gstatic.com/generate_204"
 # 有效地区列表
 VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
+# 保留节点数
+TOP_N = 15
 
 
-def test_proxy_delay(proxy: dict[str, Any]) -> int:
-    """测试代理节点真实可用性（TCP连通 + HTTP穿越验证）"""
-    server = str(proxy.get("server", ""))
-    port = proxy.get("port", 0)
-    proxy_type = str(proxy.get("type", "")).lower()
+def health_score(name: str, latency: int, region: str) -> float:
+    """计算节点健康评分"""
+    stability_seed = int(hashlib.sha256(name.encode("utf-8")).hexdigest()[:12], 16)
+    stability = random.Random(stability_seed).random()
+    bonus = 3 if region in {"HK", "SG", "JP"} else (2 if region == "US" else 1)
+    return (1.0 / max(latency, 1)) * 0.6 + bonus * 0.3 + stability * 0.1
 
-    # 第一步：TCP连通性测试
+
+# ---- Mihomo 代理引擎测试 ----
+
+def find_free_port() -> int:
+    """找一个空闲端口"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return int(sock.getsockname()[1])
+
+
+def find_or_install_mihomo() -> Path:
+    """查找或安装 mihomo 代理引擎"""
+    for name in ("mihomo", "clash-meta", "clash"):
+        found = shutil.which(name)
+        if found:
+            print(f"[OK] using proxy engine: {found}")
+            return Path(found)
+
+    install_dir = Path(tempfile.gettempdir()) / "free-grab-node-mihomo"
+    install_dir.mkdir(parents=True, exist_ok=True)
+    binary = install_dir / ("mihomo.exe" if os.name == "nt" else "mihomo")
+    if binary.exists():
+        print(f"[OK] using cached proxy engine: {binary}")
+        return binary
+
+    url = _select_mihomo_asset()
+    print(f"[INFO] downloading proxy engine: {url}")
+    archive = _download_file(url, install_dir)
+    extracted = _extract_mihomo_binary(archive, install_dir)
+    extracted.chmod(extracted.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    if extracted != binary:
+        shutil.copy2(extracted, binary)
+        binary.chmod(binary.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    return binary
+
+
+def _select_mihomo_asset() -> str:
+    """选择适合当前系统的 mihomo 二进制"""
+    api_url = "https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
+    data = requests.get(api_url, headers={"User-Agent": "free-grab-node"}, timeout=SOURCE_TIMEOUT).json()
+    assets = data.get("assets", [])
+    system = platform.system().lower()
+    machine = platform.machine().lower()
+
+    if system == "darwin":
+        os_token = "darwin"
+    elif system == "linux":
+        os_token = "linux"
+    elif system == "windows":
+        os_token = "windows"
+    else:
+        raise RuntimeError(f"unsupported OS: {system}")
+
+    arch_tokens = ["amd64-compatible", "amd64"] if machine in {"x86_64", "amd64"} else ["arm64"] if machine in {"arm64", "aarch64"} else [machine]
+    if not arch_tokens:
+        raise RuntimeError(f"unsupported arch: {machine}")
+
+    candidates: list[tuple[int, str]] = []
+    for asset in assets:
+        name = str(asset.get("name", "")).lower()
+        download_url = str(asset.get("browser_download_url", ""))
+        if not download_url or os_token not in name:
+            continue
+        if not any(t in name for t in arch_tokens):
+            continue
+        if not (name.endswith(".gz") or name.endswith(".zip")):
+            continue
+        score = 10 if "compatible" in name else 0
+        if "go120" not in name:
+            score += 2
+        candidates.append((score, download_url))
+
+    if not candidates:
+        raise RuntimeError("no matching mihomo release asset found")
+    candidates.sort(reverse=True)
+    return candidates[0][1]
+
+
+def _download_file(url: str, directory: Path) -> Path:
+    """下载文件"""
+    target = directory / Path(url.split("?")[0]).name
+    with requests.get(url, stream=True, timeout=SOURCE_TIMEOUT) as response:
+        response.raise_for_status()
+        with target.open("wb") as f:
+            for chunk in response.iter_content(chunk_size=1024 * 512):
+                if chunk:
+                    f.write(chunk)
+    return target
+
+
+def _extract_mihomo_binary(archive: Path, directory: Path) -> Path:
+    """解压 mihomo 二进制"""
+    if archive.suffix == ".gz" and not archive.name.endswith(".tar.gz"):
+        target = directory / archive.name[:-3]
+        with gzip.open(archive, "rb") as src, target.open("wb") as dst:
+            shutil.copyfileobj(src, dst)
+        return target
+    if archive.suffix == ".zip":
+        with zipfile.ZipFile(archive) as zf:
+            zf.extractall(directory)
+        for path in directory.rglob("*"):
+            if path.is_file() and "mihomo" in path.name.lower():
+                return path
+    raise RuntimeError(f"unsupported archive: {archive}")
+
+
+def _write_benchmark_config(path: Path, proxies: list[dict[str, Any]], controller_port: int) -> None:
+    """写入用于基准测试的临时 Clash 配置"""
+    names = [str(p["name"]) for p in proxies]
+    config = {
+        "mixed-port": find_free_port(),
+        "allow-lan": False,
+        "mode": "rule",
+        "log-level": "warning",
+        "external-controller": f"127.0.0.1:{controller_port}",
+        "proxies": proxies,
+        "proxy-groups": [{"name": "BENCHMARK", "type": "select", "proxies": names or ["DIRECT"]}],
+        "rules": ["MATCH,BENCHMARK"],
+    }
+    path.write_text(yaml.safe_dump(config, allow_unicode=True, sort_keys=False), encoding="utf-8")
+
+
+def _wait_for_controller(controller_url: str, process: subprocess.Popen[str]) -> None:
+    """等待 mihomo 控制器就绪"""
+    for _ in range(60):
+        if process.poll() is not None:
+            raise RuntimeError("Mihomo exited before controller became ready")
+        try:
+            if requests.get(f"{controller_url}/version", timeout=1).status_code == 200:
+                return
+        except Exception:
+            pass
+        time.sleep(0.5)
+    raise RuntimeError("Mihomo controller did not become ready")
+
+
+def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetric | None:
+    """通过 mihomo 引擎测试单个代理节点"""
+    name = str(proxy["name"])
+    url = (
+        f"{controller_url}/proxies/{quote(name, safe='')}/delay"
+        f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URL, safe='')}"
+    )
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5.0)
-        start = time.time()
-        sock.connect((server, port))
-        tcp_latency = int((time.time() - start) * 1000)
-        sock.close()
+        response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+        if response.status_code != 200:
+            return None
+        data = response.json()
+        latency = int(data.get("delay", 0))
+        if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
+            return None
+        region = detect_region(proxy)
+        score = health_score(name, latency, region)
+        return ProxyMetric(proxy=proxy, latency=latency, region=region, health_score=score)
     except Exception:
-        return 9999
-
-    # 0ms TCP延迟 = CDN节点，直接丢弃
-    if tcp_latency == 0:
-        return 9999
-
-    # 第二步：HTTP代理真实穿越测试
-    if proxy_type == "http":
-        try:
-            proxy_url = f"http://{server}:{port}"
-            username = proxy.get("username", "")
-            password = proxy.get("password", "")
-            if username:
-                proxy_url = f"http://{username}:{password}@{server}:{port}"
-
-            start = time.time()
-            resp = requests.get(
-                PROXY_TEST_URL,
-                proxies={"http": proxy_url},
-                timeout=6,
-                headers={"User-Agent": f"free-grab-node/{VERSION}"},
-            )
-            if resp.status_code in (200, 204):
-                return int((time.time() - start) * 1000)
-        except Exception:
-            pass
-        return 9999
-
-    # SOCKS5代理穿越测试
-    if proxy_type == "socks5":
-        try:
-            import socks as pysocks
-
-            s = pysocks.socksocket()
-            s.set_proxy(pysocks.SOCKS5, server, port)
-            s.settimeout(6)
-            start = time.time()
-            s.connect(("www.gstatic.com", 80))
-            s.sendall(b"GET /generate_204 HTTP/1.0\r\nHost: www.gstatic.com\r\n\r\n")
-            resp = s.recv(1024)
-            s.close()
-            if b"204" in resp or b"200" in resp:
-                return int((time.time() - start) * 1000)
-        except Exception:
-            pass
-        return 9999
-
-    # 其他协议：TCP连通 + 非0ms + 延迟<600ms 即视为可用
-    if tcp_latency < 600:
-        return tcp_latency
-    return 9999
+        return None
 
 
 def benchmark_proxies(proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
-    """测试所有代理节点延迟"""
+    """使用 mihomo 引擎对代理节点进行真实延迟测试"""
     if not proxies:
         return []
 
-    print(f"[INFO] 开始测试 {len(proxies)} 个节点的延迟...")
-    metrics: list[ProxyMetric] = []
+    engine = find_or_install_mihomo()
+    with tempfile.TemporaryDirectory(prefix="free-grab-node-") as temp_name:
+        temp_dir = Path(temp_name)
+        config_path = temp_dir / "benchmark.yaml"
+        controller_port = find_free_port()
+        controller_url = f"http://127.0.0.1:{controller_port}"
+        _write_benchmark_config(config_path, proxies, controller_port)
 
+        process = subprocess.Popen(
+            [str(engine), "-d", str(temp_dir), "-f", str(config_path)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        try:
+            _wait_for_controller(controller_url, process)
+            metrics = _run_delay_tests(controller_url, proxies)
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+        return metrics
+
+
+def _run_delay_tests(controller_url: str, proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
+    """批量测试所有节点延迟"""
     workers = max(1, min(MAX_WORKERS, len(proxies)))
-
+    metrics: list[ProxyMetric] = []
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = {
-            executor.submit(test_proxy_delay, proxy): proxy
-            for proxy in proxies
-        }
-
+        futures = {executor.submit(_test_single_proxy, controller_url, p): p for p in proxies}
         for completed, future in enumerate(as_completed(futures), start=1):
             proxy = futures[future]
             try:
-                latency = future.result()
-                region = detect_region(proxy)
-
-                # 计算健康评分（延迟越低分数越高）
-                health_score = max(0, 100 - latency / 20)
-
-                metric = ProxyMetric(
-                    proxy=proxy,
-                    latency=latency,
-                    region=region,
-                    health_score=health_score
-                )
+                metric = future.result()
+            except Exception:
+                continue
+            if metric:
                 metrics.append(metric)
-
-                if completed % 10 == 0:
-                    print(f"[INFO] 已测试 {completed}/{len(proxies)} 个节点")
-            except Exception as exc:
-                print(f"[WARN] 节点测试失败: {proxy.get('name', 'unknown')}, error={exc}")
-
-    # 按健康评分排序
+            if completed % 25 == 0 or completed == len(futures):
+                print(f"[INFO] tested {completed}/{len(futures)} kept={len(metrics)}")
     metrics.sort(key=lambda m: m.health_score, reverse=True)
-    print(f"[OK] 完成节点测试，有效节点: {len(metrics)}")
-
     return metrics
 
 
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
     """生成Clash配置文件"""
-    # 过滤：延迟600ms内 + 非0ms(CDN) + 有效地区
-    valid_metrics = [m for m in metrics if 0 < m.latency < 600 and m.region in VALID_REGIONS]
+    # 按健康评分排序，取前 TOP_N 个节点
+    metrics.sort(key=lambda m: m.health_score, reverse=True)
+    valid_metrics = metrics[:TOP_N]
 
     if not valid_metrics:
-        print("[WARN] 没有有效的代理节点，使用全部节点")
-        valid_metrics = metrics[:50]
-
-    # 按健康评分排序，取前300个
-    valid_metrics.sort(key=lambda m: m.health_score, reverse=True)
-    valid_metrics = valid_metrics[:300]
+        print("[WARN] 没有有效的代理节点")
+        valid_metrics = metrics[:5]
 
     proxies = [m.proxy for m in valid_metrics]
     proxy_names = [p["name"] for p in proxies]
@@ -741,20 +852,12 @@ def main() -> None:
 
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT}")
 
-    # 生成Shadowrocket订阅（过滤超时、CDN、无效地区节点，按健康评分排序）
-    # 只保留可用节点（延迟 < 600ms 且非9999超时）
-    valid_metrics = [m for m in metrics if 0 < m.latency < 600]
-    # 仅保留有效地区节点
-    valid_metrics = [m for m in valid_metrics if m.region in VALID_REGIONS]
-    print(f"[INFO] 有效节点: {len(valid_metrics)}/{len(metrics)} (延迟<600ms, 非CDN, 有效地区)")
-
-    # 按健康评分排序，取前200个节点
-    valid_metrics.sort(key=lambda m: m.health_score, reverse=True)
-    rocket_proxies = [m.proxy for m in valid_metrics[:200]]
+    # 生成Shadowrocket订阅（取Top 15节点）
+    metrics.sort(key=lambda m: m.health_score, reverse=True)
+    rocket_proxies = [m.proxy for m in metrics[:TOP_N]]
     rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
-
     print(f"[OK] Shadowrocket订阅已生成: {ROCKET_OUTPUT} ({len(rocket_proxies)} 节点)")
     print(f"完成时间: {datetime.now(timezone.utc).isoformat()}")
 
