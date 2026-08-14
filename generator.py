@@ -11,7 +11,6 @@ import hashlib
 import json
 import os
 import platform
-import random
 import re
 import shutil
 import socket
@@ -36,7 +35,7 @@ ROCKET_OUTPUT = Path("output/rocket.txt")
 V2RAY_OUTPUT = Path("output/v2ray.txt")
 TEST_URL = "http://www.gstatic.com/generate_204"
 SOURCE_TIMEOUT = 25
-LATENCY_TIMEOUT_MS = 6000
+LATENCY_TIMEOUT_MS = 3000
 MAX_RETRIES = 3
 MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "12"))
 
@@ -276,19 +275,16 @@ def detect_region(proxy: dict[str, Any]) -> str:
 
 
 # 代理可用性测试URL
-PROXY_TEST_URL = "http://www.gstatic.com/generate_204"
+PROXY_TEST_URL = "https://www.google.com/generate_204"
 # 有效地区列表
 VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
 # 保留节点数
-TOP_N = 15
+TOP_N = 30
 
 
 def health_score(name: str, latency: int, region: str) -> float:
-    """计算节点健康评分"""
-    stability_seed = int(hashlib.sha256(name.encode("utf-8")).hexdigest()[:12], 16)
-    stability = random.Random(stability_seed).random()
-    bonus = 3 if region in {"HK", "SG", "JP"} else (2 if region == "US" else 1)
-    return (1.0 / max(latency, 1)) * 0.6 + bonus * 0.3 + stability * 0.1
+    """计算节点健康评分（纯延迟排名，延迟越低分越高）"""
+    return 1.0 / max(latency, 1)
 
 
 # ---- Mihomo 代理引擎测试 ----
@@ -537,6 +533,7 @@ def _run_delay_tests(controller_url: str, proxies: list[dict[str, Any]]) -> list
             if completed % 25 == 0 or completed == len(futures):
                 print(f"[INFO] tested {completed}/{len(futures)} kept={len(metrics)}")
     metrics.sort(key=lambda m: m.health_score, reverse=True)
+    print(f"[INFO] mihomo精测完成: {len(metrics)} 个节点通过")
     return metrics
 
 
