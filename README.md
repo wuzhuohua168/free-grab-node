@@ -19,23 +19,6 @@
 - 真实代理延迟测试，精准过滤无效节点
 - GitHub Actions 每30分钟全自动更新
 
-## 订阅链接
-
-### Clash Verge / Mihomo
-
-```
-https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/clash.yaml
-```
-
-### Shadowrocket / 小火箭
-
-```
-https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/rocket.txt
-```
-
-在 Shadowrocket 中点击右上角 + → 类型选择 **Subscribe** → URL 填入上面的链接。
-
-## 使用方法
 
 ### 手动运行
 
@@ -53,14 +36,6 @@ python generator.py
 - `output/clash.yaml` - Clash 配置
 - `output/rocket.txt` - Shadowrocket 订阅（base64编码）
 
-## 节点源
-
-本项目从以下公开源提取节点：
-
-- openRunner/clash-freenode
-- snakem982/proxypool
-- Flikify/Free-Node
-- aiboboxx/v2rayfree
 
 ## 项目结构
 
