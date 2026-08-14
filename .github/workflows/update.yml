@@ -22,8 +22,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -38,29 +36,16 @@ jobs:
       - name: Generate subscriptions
         run: |
           python generator.py
-          # 复制配置文件到docs目录（用于GitHub Pages）
           mkdir -p docs
           cp output/clash.yaml docs/clash.yaml
           cp output/rocket.txt docs/rocket.txt
           cp output/v2ray.txt docs/v2ray.txt
           touch docs/.nojekyll
 
-      - name: Commit and push changes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add output/clash.yaml output/rocket.txt output/v2ray.txt docs/clash.yaml docs/rocket.txt docs/v2ray.txt docs/.nojekyll deploy/results.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "Update proxy subscriptions - $(date '+%Y-%m-%d %H:%M:%S')"
-            git pull --rebase "https://x-access-token:${GH_TOKEN}@github.com/wuzhuohua168/free-grab-node.git" main
-            git push "https://x-access-token:${GH_TOKEN}@github.com/wuzhuohua168/free-grab-node.git" main
-          fi
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update proxy subscriptions - $(date '+%Y-%m-%d %H:%M:%S')"
+          file_pattern: 'output/* docs/* deploy/results.json'
 
       - name: Validate configuration
         run: |
