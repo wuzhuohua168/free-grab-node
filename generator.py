@@ -30,7 +30,7 @@ from urllib.parse import quote
 import requests
 import yaml
 
-VERSION = "v1.2.1"
+VERSION = "v1.2.2"
 CLASH_OUTPUT = Path("output/clash.yaml")
 ROCKET_OUTPUT = Path("output/rocket.txt")
 V2RAY_OUTPUT = Path("output/v2ray.txt")
