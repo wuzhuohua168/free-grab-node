@@ -17,13 +17,13 @@
 ### Clash Verge / Mihomo
 
 ```
-https://wuzhuohua168.github.io/free-grab-node/clash.yaml
+https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/clash.yaml
 ```
 
 ### Shadowrocket / 小火箭
 
 ```
-https://wuzhuohua168.github.io/free-grab-node/rocket.txt
+https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/docs/rocket.txt
 ```
 
 在 Shadowrocket 中点击右上角 + → 类型选择 **Subscribe** → URL 填入上面的链接。
@@ -100,11 +100,20 @@ GitHub Actions 每30分钟自动运行一次，执行以下操作：
 - 国内网站 → DIRECT
 - GeoIP CN → DIRECT
 
-## 启用 GitHub Pages
+## 启用 GitHub Pages（可选）
+
+如需使用更短域名 `github.io` 访问，可启用 GitHub Pages：
 
 1. 进入仓库 Settings → Pages
-2. Source 选择 `/docs` 目录
-3. 保存后等待部署
+2. Source 选择 Deploy from a branch
+3. Branch 选择 `main`，文件夹选择 `/docs`
+4. 保存并等待部署完成
+
+启用后订阅地址：
+```
+https://wuzhuohua168.github.io/free-grab-node/clash.yaml
+https://wuzhuohua168.github.io/free-grab-node/rocket.txt
+```
 
 ## 支持的代理类型
 
