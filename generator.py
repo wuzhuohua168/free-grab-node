@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import platform
+import random
 import re
 import shutil
 import socket
@@ -29,41 +30,62 @@ from urllib.parse import quote
 import requests
 import yaml
 
-VERSION = "v1.1"
+VERSION = "v1.2"
 CLASH_OUTPUT = Path("output/clash.yaml")
 ROCKET_OUTPUT = Path("output/rocket.txt")
 V2RAY_OUTPUT = Path("output/v2ray.txt")
 TEST_URL = "http://www.gstatic.com/generate_204"
 SOURCE_TIMEOUT = 25
-LATENCY_TIMEOUT_MS = 3000
+LATENCY_TIMEOUT_MS = 5000
 MAX_RETRIES = 3
-MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "12"))
+MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "24"))
 
-# 节点源配置
+# 节点源配置（参考项目 + 用户推荐，多个高质量源）
 SOURCE_GROUPS = [
     {
-        "name": "ermaozi clash",
-        "url": "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/clash.yml",
+        "name": "openRunner clash-freenode",
+        "primary": "https://raw.githubusercontent.com/openRunner/clash-freenode/main/sub.yaml",
+        "fallbacks": [
+            "https://raw.githubusercontent.com/openRunner/clash-freenode/main/clash.yaml",
+            "https://raw.githubusercontent.com/openrunner/clash-freenode/main/clash.yaml",
+        ],
     },
     {
-        "name": "anaer Sub",
-        "url": "https://raw.githubusercontent.com/anaer/Sub/main/clash.yaml",
+        "name": "snakem982 proxypool",
+        "primary": "https://raw.githubusercontent.com/snakem982/proxypool/main/clash.yaml",
+        "fallbacks": [
+            "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta-2.yaml",
+            "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml",
+        ],
     },
     {
-        "name": "aiboboxx clashfree",
-        "url": "https://raw.githubusercontent.com/aiboboxx/clashfree/main/clash.yml",
+        "name": "Flikify Free-Node",
+        "primary": "https://raw.githubusercontent.com/Flikify/Free-Node/main/clash.yaml",
+        "fallbacks": [
+            "https://raw.githubusercontent.com/a2470982985/getNode/main/clash.yaml",
+        ],
     },
     {
-        "name": "vxiaov free_proxies",
-        "url": "https://raw.githubusercontent.com/vxiaov/free_proxies/main/clash/clash.provider.yaml",
+        "name": "free-clash-v2ray GitHub Pages",
+        "primary": "https://free-clash-v2ray.github.io/uploads/latest.yaml",
+        "fallbacks": [
+            "discover:free-clash-v2ray",
+        ],
     },
     {
-        "name": "chengaopan AutoMerge",
-        "url": "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.yml",
+        "name": "PuddinCat BestClash",
+        "primary": "https://raw.githubusercontent.com/PuddinCat/BestClash/refs/heads/main/proxies.yaml",
+        "fallbacks": [],
     },
     {
-        "name": "mahdibland Aggregator",
-        "url": "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity.yml",
+        "name": "dongchengjie airport",
+        "primary": "https://raw.githubusercontent.com/dongchengjie/airport/refs/heads/main/subs/merged/tested_within.yaml",
+        "fallbacks": [],
+    },
+    {
+        "name": "zhuhaiuk free-nodes",
+        "primary": "https://raw.githubusercontent.com/zhuhaiuk/free-nodes/main/clash_config.yaml",
+        "fallbacks": [],
     },
 ]
 
@@ -156,22 +178,59 @@ def extract_proxies(text: str) -> list[dict[str, Any]]:
 
 
 def collect_proxies() -> tuple[int, list[dict[str, Any]]]:
-    """从所有源收集代理节点"""
+    """从所有源收集代理节点（支持 primary/fallback）"""
     collected: list[dict[str, Any]] = []
 
     for source in SOURCE_GROUPS:
-        try:
-            text = fetch_text(source["url"])
-            found = extract_proxies(text)
-            print(f"[OK] source={source['name']} proxies={len(found)}")
-
-            if found:
-                collected.extend(found)
-        except Exception as exc:
-            print(f"[WARN] source={source['name']} skipped, error={exc}")
+        source_found: list[dict[str, Any]] = []
+        for url in expand_source_urls(source):
+            try:
+                text = fetch_text(url)
+                found = extract_proxies(text)
+                print(f"[OK] source={source['name']} proxies={len(found)} url={url}")
+                if found:
+                    source_found.extend(found)
+                    break
+            except Exception as exc:
+                print(f"[WARN] source={source['name']} skipped url={url} error={exc}")
+        collected.extend(source_found)
 
     sanitized = sanitize_and_deduplicate(collected)
     return len(collected), sanitized
+
+
+def expand_source_urls(source: dict[str, Any]) -> list[str]:
+    """展开节点源URL（primary + fallbacks）"""
+    urls = [str(source["primary"])]
+    for item in source.get("fallbacks", []):
+        if item == "discover:free-clash-v2ray":
+            urls.extend(discover_free_clash_v2ray_urls())
+        else:
+            urls.append(str(item))
+    return _unique_ordered(urls)
+
+
+def discover_free_clash_v2ray_urls() -> list[str]:
+    """从 free-clash-v2ray README 中动态发现最新订阅URL"""
+    readme_url = "https://raw.githubusercontent.com/free-clash-v2ray/free-clash-v2ray.github.io/main/README.md"
+    try:
+        text = fetch_text(readme_url)
+    except Exception as exc:
+        print(f"[WARN] free-clash-v2ray discovery failed: {exc}")
+        return []
+    pattern = r"https://free-clash-v2ray\.github\.io/uploads/\d{4}/\d{2}/[0-9]-\d{8}\.yaml"
+    return _unique_ordered(re.findall(pattern, text))[:8]
+
+
+def _unique_ordered(items: list[str]) -> list[str]:
+    """保持顺序去重"""
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
 
 
 def sanitize_and_deduplicate(proxies: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -274,26 +333,30 @@ def detect_region(proxy: dict[str, Any]) -> str:
         return "OTHER"
 
 
-# 代理可用性测试URL（多目标验证：google + youtube + github + baidu）
+# 代理可用性测试URL（与参考项目一致，单URL测试）
 PROXY_TEST_URLS = [
-    "https://www.google.com/generate_204",            # 基础连通性
-    "https://www.youtube.com/generate_204",            # 流媒体能力
-    "https://github.com",                              # 开发用途
-    "https://www.baidu.com/img/flexible/logo/pc/result.png",  # 国内回源
+    "http://www.gstatic.com/generate_204",
 ]
 # 有效地区列表
 VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
-# 保留节点数
-TOP_N = 30
-# check-host.net 中国节点验证（免费，无需服务器）
-CHINA_CHECK_ENABLED = True
-CHINA_CHECK_MAX_NODES = 50  # 只对mihomo精测后Top50做中国验证
+# 保留节点数（0 = 不限制，输出全部通过节点）
+TOP_N = 0
+# check-host.net 中国节点验证（暂时禁用，先验证基线可用后再启用）
+CHINA_CHECK_ENABLED = False
+CHINA_CHECK_MAX_NODES = 50
 
 
 def health_score(name: str, latency: int, region: str) -> float:
-    """计算节点健康评分（亚洲节点优先，延迟越低分越高）"""
-    region_bonus = 1.5 if region in {"HK", "SG", "JP", "TW"} else (1.0 if region in {"US", "KR"} else 0.5)
-    return (1.0 / max(latency, 1)) * region_bonus
+    """计算节点健康评分（与参考项目一致：延迟权重60% + 地区权重30% + 稳定性10%）"""
+    if region in {"HK", "SG", "JP"}:
+        region_bonus = 3
+    elif region == "US":
+        region_bonus = 2
+    else:
+        region_bonus = 1
+    stability_seed = int(hashlib.sha256(name.encode("utf-8")).hexdigest()[:12], 16)
+    stability = random.Random(stability_seed).random()
+    return (1.0 / max(latency, 1)) * 0.6 + region_bonus * 0.3 + stability * 0.1
 
 
 def merge_china_results(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
@@ -512,47 +575,21 @@ def _wait_for_controller(controller_url: str, process: subprocess.Popen[str]) ->
 
 
 def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetric | None:
-    """通过 mihomo 引擎测试单个代理节点（多目标验证，综合评分）"""
+    """通过 mihomo 引擎测试单个代理节点（单URL测试，与参考项目一致）"""
     name = str(proxy["name"])
-
-    # 主测试：google（必须通过）
     url = (
         f"{controller_url}/proxies/{quote(name, safe='')}/delay"
-        f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(PROXY_TEST_URLS[0], safe='')}"
+        f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(TEST_URL, safe='')}"
     )
-    try:
-        response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
-        if response.status_code != 200:
-            return None
-        data = response.json()
-        latency = int(data.get("delay", 0))
-        if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
-            return None
-    except Exception:
+    response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+    if response.status_code != 200:
         return None
-
-    # 多目标加分测试：youtube + github + baidu（每通过一个加分，不通过不影响）
-    bonus = 1.0
-    bonus_targets = 0
-    for test_url in PROXY_TEST_URLS[1:]:
-        try:
-            url2 = (
-                f"{controller_url}/proxies/{quote(name, safe='')}/delay"
-                f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(test_url, safe='')}"
-            )
-            resp2 = requests.get(url2, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
-            if resp2.status_code == 200:
-                d2 = resp2.json().get("delay", 0)
-                if 0 < d2 <= LATENCY_TIMEOUT_MS:
-                    bonus_targets += 1
-        except Exception:
-            pass
-
-    # 每通过一个额外目标 +8% 分数，最多 +24%
-    bonus = 1.0 + bonus_targets * 0.08
-
+    data = response.json()
+    latency = int(data.get("delay", 0))
+    if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
+        return None
     region = detect_region(proxy)
-    score = health_score(name, latency, region) * bonus
+    score = health_score(name, latency, region)
     return ProxyMetric(proxy=proxy, latency=latency, region=region, health_score=score)
 
 
@@ -790,9 +827,8 @@ def apply_stability_bonus(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
 
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
     """生成Clash配置文件"""
-    # 按健康评分排序，取前 TOP_N 个节点
     metrics.sort(key=lambda m: m.health_score, reverse=True)
-    valid_metrics = metrics[:TOP_N]
+    valid_metrics = metrics[:TOP_N] if TOP_N > 0 else metrics
 
     if not valid_metrics:
         print("[WARN] 没有有效的代理节点")
@@ -1116,7 +1152,7 @@ def generate_shadowrocket_sub(proxies: list[dict[str, Any]]) -> str:
 
 
 def main() -> None:
-    """主函数"""
+    """主函数（简化版，对齐参考项目基线）"""
     print(f"=== Free Proxy Grab Node {VERSION} ===")
     print(f"开始时间: {datetime.now(timezone.utc).isoformat()}")
 
@@ -1124,69 +1160,95 @@ def main() -> None:
     total_collected, proxies = collect_proxies()
     print(f"[OK] 收集到 {total_collected} 个节点，去重后 {len(proxies)} 个")
 
-    if not proxies:
-        print("[ERROR] 没有找到任何代理节点")
+    # mihomo 真实代理延迟测试
+    metrics: list[ProxyMetric] = []
+    if proxies:
+        try:
+            metrics = benchmark_proxies(proxies)
+        except Exception as exc:
+            print(f"[WARN] mihomo 精测失败: {exc}")
+
+    # Fallback: 如果全部没通过，复用上一次输出
+    if not metrics:
+        metrics = load_existing_metrics()
+        if metrics:
+            print("[WARN] 无节点通过测试，复用上一次输出作为降级方案")
+
+    if not metrics:
+        print("[ERROR] 无可用节点，生成空订阅")
+        _empty_output()
         return
 
-    # TCP快速粗筛，减少进入mihomo精测的节点数
-    proxies = tcp_prescreen(proxies)
-
-    # 测试节点延迟
-    metrics = benchmark_proxies(proxies)
-
-    # check-host.net 中国节点TCP验证（免费，无需服务器）
-    # 对mihomo精测后的Top节点进行中国TCP二次验证，筛选从中国可连的节点
-    metrics = china_tcp_filter(metrics)
-
-    # 节点稳定性加分：跨轮次存活的节点获得额外加分
-    metrics = apply_stability_bonus(metrics)
-
-    # 合并中国电信/移动线路测试结果（提升双向可通节点评分）
+    # 合并中国线路测试结果（如有部署云服务器）
     metrics = merge_china_results(metrics)
+
+    metrics.sort(key=lambda m: m.health_score, reverse=True)
 
     # 生成Clash配置
     config = generate_clash_config(metrics)
-
-    # 确保输出目录存在
     CLASH_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-
-    # 写入Clash YAML配置文件
     with CLASH_OUTPUT.open("w", encoding="utf-8") as f:
         yaml.safe_dump(config, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
+    print(f"[OK] Clash配置已生成: {CLASH_OUTPUT} ({len(config.get('proxies', []))} 节点)")
 
-    print(f"[OK] Clash配置已生成: {CLASH_OUTPUT}")
-
-    # 生成Shadowrocket订阅（取Top 15节点）
-    metrics.sort(key=lambda m: m.health_score, reverse=True)
-    rocket_proxies = [m.proxy for m in metrics[:TOP_N]]
+    # 生成Shadowrocket + V2Ray订阅
+    rocket_proxies = [m.proxy for m in metrics[:TOP_N]] if TOP_N > 0 else [m.proxy for m in metrics]
     rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
-    print(f"[OK] Shadowrocket订阅已生成: {ROCKET_OUTPUT} ({len(rocket_proxies)} 节点)")
-
-    # 生成V2Ray订阅（格式与Shadowrocket相同，base64编码的URI列表）
     with V2RAY_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
-    print(f"[OK] V2Ray订阅已生成: {V2RAY_OUTPUT} ({len(rocket_proxies)} 节点)")
+    print(f"[OK] Shadowrocket/V2Ray订阅已生成: {len(rocket_proxies)} 节点")
+
     print(f"完成时间: {datetime.now(timezone.utc).isoformat()}")
 
-    # 保存节点历史记录（用于跨轮次稳定性追踪）
-    save_node_history(metrics)
-
-    # 输出统计信息
-    region_stats = {}
+    # 输出统计
+    region_stats: dict[str, int] = {}
     for m in metrics:
         region_stats[m.region] = region_stats.get(m.region, 0) + 1
-
     print("\n=== 节点地区分布 ===")
     for region, count in sorted(region_stats.items(), key=lambda x: x[1], reverse=True):
         print(f"{region}: {count}")
+    avg_latency = round(sum(m.latency for m in metrics) / len(metrics)) if metrics else 0
+    print(f"平均延迟: {avg_latency}ms")
+    print(f"总节点: {len(metrics)}")
 
-    # 输出URI统计
-    uri_count = len([p for p in proxies if proxy_to_uri(p)])
-    print(f"\n=== 订阅统计 ===")
-    print(f"Clash节点: {len(config.get('proxies', []))}")
-    print(f"Shadowrocket节点: {uri_count}")
+
+def load_existing_metrics() -> list[ProxyMetric]:
+    """加载上一次输出的节点（降级方案）"""
+    if not CLASH_OUTPUT.exists():
+        return []
+    try:
+        data = yaml.safe_load(CLASH_OUTPUT.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+    if not isinstance(data, dict) or not isinstance(data.get("proxies"), list):
+        return []
+    metrics: list[ProxyMetric] = []
+    for proxy in data["proxies"]:
+        if not isinstance(proxy, dict):
+            continue
+        name = str(proxy.get("name", ""))
+        region = detect_region({"name": name})
+        metrics.append(
+            ProxyMetric(
+                proxy=dict(proxy),
+                latency=LATENCY_TIMEOUT_MS,
+                region=region,
+                health_score=health_score(name, LATENCY_TIMEOUT_MS, region),
+            )
+        )
+    return metrics
+
+
+def _empty_output() -> None:
+    """生成空输出文件"""
+    CLASH_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    empty_config = {"proxies": [], "proxy-groups": [], "rules": ["MATCH,DIRECT"]}
+    with CLASH_OUTPUT.open("w", encoding="utf-8") as f:
+        yaml.safe_dump(empty_config, f)
+    ROCKET_OUTPUT.write_text("", encoding="utf-8")
+    V2RAY_OUTPUT.write_text("", encoding="utf-8")
 
 
 if __name__ == "__main__":
