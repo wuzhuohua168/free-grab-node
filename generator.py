@@ -341,7 +341,7 @@ PROXY_TEST_URLS = [
 # 有效地区列表
 VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
 # 保留节点数（0 = 不限制，输出全部通过节点）
-TOP_N = 0
+TOP_N = 15
 # check-host.net 中国节点验证（暂时禁用，先验证基线可用后再启用）
 CHINA_CHECK_ENABLED = False
 CHINA_CHECK_MAX_NODES = 50
