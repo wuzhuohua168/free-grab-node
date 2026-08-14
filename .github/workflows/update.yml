@@ -31,12 +31,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pyyaml
 
-      - name: Generate Clash subscription
+      - name: Generate subscriptions
         run: |
           python generator.py
           # 复制配置文件到docs目录（用于GitHub Pages）
           mkdir -p docs
           cp output/clash.yaml docs/clash.yaml
+          cp output/rocket.txt docs/rocket.txt
           touch docs/.nojekyll
 
       - name: Commit and push changes
@@ -44,52 +45,63 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add output/clash.yaml docs/clash.yaml docs/.nojekyll
+          git add output/clash.yaml output/rocket.txt docs/clash.yaml docs/rocket.txt docs/.nojekyll
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Update Clash subscription - $(date '+%Y-%m-%d %H:%M:%S')"
+            git commit -m "Update proxy subscriptions - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
           fi
 
       - name: Validate configuration
         run: |
-          # 检查配置文件是否存在且有效
+          # 检查所有输出文件是否存在且有效
           test -s output/clash.yaml
+          test -s output/rocket.txt
           test -s docs/clash.yaml
+          test -s docs/rocket.txt
 
-          # 验证YAML格式
+          # 验证Clash YAML格式
           python - <<'PY'
           from pathlib import Path
           import yaml
 
           data = yaml.safe_load(Path("docs/clash.yaml").read_text(encoding="utf-8"))
-
           if not isinstance(data, dict):
               raise SystemExit("Invalid YAML format")
-
-          # 检查必需字段
           for key in ["proxies", "proxy-groups", "rules"]:
               if key not in data:
                   raise SystemExit(f"Missing required key: {key}")
-
-          print(f"✓ Configuration valid: {len(data['proxies'])} proxies")
+          print(f"Clash: {len(data['proxies'])} proxies")
           PY
 
-          # 启动本地服务器进行验证
+          # 验证Shadowrocket订阅格式（base64解码后应为有效URI列表）
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+
+          content = Path("docs/rocket.txt").read_text(encoding="utf-8").strip()
+          decoded = base64.b64decode(content).decode("utf-8")
+          uris = [line for line in decoded.splitlines() if line.strip()]
+          if not uris:
+              raise SystemExit("Empty Shadowrocket subscription")
+          print(f"Shadowrocket: {len(uris)} URIs")
+          PY
+
+          # 启动本地服务器进行HTTP访问验证
           python -m http.server 8080 --directory docs >/tmp/server.log 2>&1 &
           server_pid=$!
           trap 'kill $server_pid 2>/dev/null' EXIT
 
           sleep 2
 
-          # 测试HTTP访问
-          http_code=$(curl --silent --output /dev/null --write-out "%{http_code}" http://127.0.0.1:8080/clash.yaml)
+          for file in clash.yaml rocket.txt; do
+            http_code=$(curl --silent --output /dev/null --write-out "%{http_code}" "http://127.0.0.1:8080/${file}")
+            if [ "$http_code" != "200" ]; then
+              echo "Failed to access ${file} via HTTP: $http_code"
+              exit 1
+            fi
+          done
 
-          if [ "$http_code" != "200" ]; then
-            echo "Failed to access clash.yaml via HTTP: $http_code"
-            exit 1
-          fi
-
-          echo "✓ HTTP access test passed"
+          echo "All subscriptions accessible via HTTP"
