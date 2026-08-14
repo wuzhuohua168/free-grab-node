@@ -149,8 +149,35 @@ def load_yaml_document(text: str) -> Any:
         return None
 
 
+def extract_proxy_block(text: str) -> list[Any]:
+    """当 YAML 文档解析失败时，从原始文本中提取 proxies: 块（与原项目一致）"""
+    lines = maybe_base64_decode(text).splitlines()
+    start: int | None = None
+    for index, line in enumerate(lines):
+        if re.match(r"^proxies\s*:\s*$", line):
+            start = index
+            break
+    if start is None:
+        return []
+
+    block: list[str] = []
+    for line in lines[start + 1:]:
+        if line and not line.startswith((" ", "\t", "-")) and re.match(r"^[A-Za-z0-9_-]+\s*:", line):
+            break
+        block.append(line)
+
+    try:
+        parsed = yaml.safe_load("proxies:\n" + "\n".join(block))
+    except yaml.YAMLError as exc:
+        print(f"[WARN] proxy block parse failed: {exc}")
+        return []
+    if isinstance(parsed, dict) and isinstance(parsed.get("proxies"), list):
+        return parsed["proxies"]
+    return []
+
+
 def extract_proxies(text: str) -> list[dict[str, Any]]:
-    """从文本中提取代理节点"""
+    """从文本中提取代理节点（与原项目一致：支持 YAML 解析 + proxy block 回退）"""
     document = load_yaml_document(text)
 
     if isinstance(document, dict):
@@ -159,6 +186,9 @@ def extract_proxies(text: str) -> list[dict[str, Any]]:
         proxies = document
     else:
         proxies = []
+
+    if not proxies:
+        proxies = extract_proxy_block(text)
 
     clean: list[dict[str, Any]] = []
     for proxy in proxies:
@@ -368,113 +398,23 @@ def detect_region_by_name(name: str) -> str:
     return "OTHER"
 
 
-# 代理可用性测试URL（与参考项目一致，单URL测试）
-PROXY_TEST_URLS = [
-    "http://www.gstatic.com/generate_204",
-]
-# 有效地区列表
-VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
-# 保留节点数（0 = 不限制，输出全部通过节点）
-TOP_N = 15
-# check-host.net 中国节点验证（暂时禁用，先验证基线可用后再启用）
-CHINA_CHECK_ENABLED = False
-CHINA_CHECK_MAX_NODES = 50
+def region_bonus(region: str) -> int:
+    """地区评分加成（与原项目一致）"""
+    if region in {"HK", "SG", "JP"}:
+        return 3
+    if region == "US":
+        return 2
+    return 1
 
 
 def health_score(name: str, latency: int, region: str) -> float:
-    """计算节点健康评分（与参考项目一致：延迟权重60% + 地区权重30% + 稳定性10%）"""
-    if region in {"HK", "SG", "JP"}:
-        region_bonus = 3
-    elif region == "US":
-        region_bonus = 2
-    else:
-        region_bonus = 1
+    """计算节点健康评分（与原项目一致：延迟权重60% + 地区权重30% + 稳定性10%）"""
     stability_seed = int(hashlib.sha256(name.encode("utf-8")).hexdigest()[:12], 16)
     stability = random.Random(stability_seed).random()
-    return (1.0 / max(latency, 1)) * 0.6 + region_bonus * 0.3 + stability * 0.1
-
-
-def merge_china_results(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
-    """合并中国电信/移动线路测试结果，提升双向可通节点的评分"""
-    results_path = Path("deploy/results.json")
-    if not results_path.exists():
-        print("[INFO] 无中国线路测试结果，跳过合并")
-        return metrics
-
-    try:
-        with results_path.open("r", encoding="utf-8") as f:
-            china_data = json.load(f)
-    except Exception as e:
-        print(f"[WARN] 读取中国线路结果失败: {e}")
-        return metrics
-
-    results = china_data.get("results", {})
-    if not results:
-        print("[INFO] 中国线路测试结果为空")
-        return metrics
-
-    # 建立 name -> passed 映射
-    china_passed: set[str] = set()
-    for name, vals in results.items():
-        if vals.get("connectivity") or vals.get("google"):
-            china_passed.add(name)
-
-    print(f"[INFO] 中国线路通过节点: {len(china_passed)}")
-
-    if not china_passed:
-        return metrics
-
-    # 对通过中国线路测试的节点提升评分
-    for m in metrics:
-        if m.proxy["name"] in china_passed:
-            m.health_score *= 2.0  # 通过中国线路的节点评分翻倍
-
-    return metrics
+    return (1 / latency) * 0.6 + region_bonus(region) * 0.3 + stability * 0.1
 
 
 # ---- Mihomo 代理引擎测试 ----
-
-def _tcp_quick_test(proxy: dict[str, Any]) -> tuple[dict[str, Any], int] | None:
-    """快速TCP连通性测试（3秒超时，用于粗筛）"""
-    server = str(proxy.get("server", ""))
-    port = proxy.get("port", 0)
-    if not server or not port:
-        return None
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3.0)
-        start = time.time()
-        sock.connect((server, port))
-        latency = int((time.time() - start) * 1000)
-        sock.close()
-        if latency == 0 or latency > 800:  # CDN或超慢节点
-            return None
-        return (proxy, latency)
-    except Exception:
-        return None
-
-
-def tcp_prescreen(proxies: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """TCP快速粗筛，大幅减少需要 mihomo 精测的节点数"""
-    if len(proxies) <= 300:
-        return proxies
-
-    print(f"[INFO] TCP快速粗筛 {len(proxies)} 个节点...")
-    passed: list[dict[str, Any]] = []
-    workers = max(1, min(MAX_WORKERS, len(proxies)))
-
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = {executor.submit(_tcp_quick_test, p): p for p in proxies}
-        for completed, future in enumerate(as_completed(futures), start=1):
-            result = future.result()
-            if result:
-                passed.append(result[0])
-            if completed % 200 == 0 or completed == len(futures):
-                print(f"[INFO] TCP粗筛: {completed}/{len(futures)} passed={len(passed)}")
-
-    print(f"[INFO] TCP粗筛完成: {len(passed)}/{len(proxies)} 进入mihomo精测")
-    return passed
-
 
 def find_free_port() -> int:
     """找一个空闲端口"""
@@ -679,231 +619,16 @@ def _run_delay_tests(controller_url: str, proxies: list[dict[str, Any]]) -> list
     return metrics
 
 
-# ---- check-host.net 中国节点 TCP 验证（免费，无需服务器） ----
-
-# check-host.net 中国节点TCP验证
-CHINA_CHECK_REGIONS = {"cn", "hk", "tw", "sg", "jp", "kr"}  # 亚太节点（GFW上游，接近中国网络环境）
-
-
-def _check_host_china_tcp(server: str, port: int) -> tuple[bool, int]:
-    """通过 check-host.net 免费API验证中国/亚太节点TCP连通性
-    返回 (是否通过, 通过的亚太节点数)
-    """
-    if not CHINA_CHECK_ENABLED:
-        return True, 0
-
-    try:
-        # 发起检测请求，max_nodes=10 增加命中中国节点的概率
-        init_resp = requests.get(
-            "https://check-host.net/check-tcp",
-            params={"host": f"{server}:{port}", "max_nodes": 10},
-            headers={"Accept": "application/json"},
-            timeout=15,
-        )
-        if init_resp.status_code != 200:
-            return False, 0
-        data = init_resp.json()
-        request_id = data.get("request_id")
-        if not request_id:
-            return False, 0
-
-        # 从 init 响应中读取节点国家代码（hostname 不含国家信息）
-        # 格式: {"sg1.node.check-host.net": ["sg", "Singapore", ...], ...}
-        nodes_info = data.get("nodes", {})
-
-        # 等待结果
-        time.sleep(4)
-
-        # 获取结果
-        result_resp = requests.get(
-            f"https://check-host.net/check-result/{request_id}",
-            headers={"Accept": "application/json"},
-            timeout=15,
-        )
-        if result_resp.status_code != 200:
-            return False, 0
-
-        results = result_resp.json()
-        china_passed = 0
-
-        for node_host, node_result in results.items():
-            if not isinstance(node_result, list) or not node_result:
-                continue
-            # 用 init 响应中的国家代码判断是否为中国/亚太节点
-            node_meta = nodes_info.get(node_host)
-            if not node_meta or not isinstance(node_meta, list) or len(node_meta) == 0:
-                continue
-            country_code = str(node_meta[0]).lower()
-            if country_code not in CHINA_CHECK_REGIONS:
-                continue
-            # 检查TCP连接是否成功（成功: {"address": "x.x.x.x", "time": 0.004}）
-            for r in node_result:
-                if isinstance(r, dict) and r.get("error") is None:
-                    china_passed += 1
-                    break
-
-        passed = china_passed >= 1  # 至少1个亚太节点通过
-        return passed, china_passed
-
-    except Exception as e:
-        print(f"[WARN] check-host.net 验证失败 ({server}:{port}): {e}")
-        return False, 0
-
-
-def china_tcp_filter(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
-    """通过 check-host.net 中国/亚太节点TCP验证过滤节点（硬过滤）"""
-    if not CHINA_CHECK_ENABLED:
-        return metrics
-
-    top_n = min(CHINA_CHECK_MAX_NODES, len(metrics))
-    if top_n == 0:
-        return metrics
-
-    print(f"[INFO] check-host.net 中国TCP验证: 对Top {top_n} 节点进行验证...")
-    candidates = metrics[:top_n]
-
-    verified: list[ProxyMetric] = []
-    failed = 0
-
-    for i, m in enumerate(candidates):
-        server = str(m.proxy.get("server", ""))
-        port = m.proxy.get("port", 0)
-        if not server or not port:
-            continue
-
-        passed, china_nodes = _check_host_china_tcp(server, port)
-        if passed:
-            # 通过中国验证的节点大幅加分
-            m.health_score *= 1.5
-            verified.append(m)
-            if (i + 1) % 10 == 0 or i == len(candidates) - 1:
-                print(f"[INFO] 中国TCP: {i + 1}/{len(candidates)} verified={len(verified)}")
-        else:
-            failed += 1
-        # 控制请求频率，避免被限流
-        time.sleep(0.8)
-
-    print(f"[INFO] 中国TCP验证完成: {len(verified)} 通过, {failed} 未通过")
-
-    # 硬过滤：只保留通过中国验证的节点，不凑数
-    # 未进入Top N的节点保留（它们没被验证过，作为后备）
-    rest = metrics[top_n:]
-
-    if verified:
-        verified.sort(key=lambda m: m.health_score, reverse=True)
-        result = verified + rest
-        print(f"[INFO] 中国TCP硬过滤: 验证通过 {len(verified)} + 未验证后备 {len(rest)} = 共 {len(result)} 节点")
-        return result
-    else:
-        # 全部未通过验证，返回原结果（但标记警告）
-        print("[WARN] 中国TCP验证全部未通过，保留原mihomo结果（节点质量可能较差）")
-        return metrics
-
-
-# ---- 节点稳定性追踪（跨轮次存活加分） ----
-
-HISTORY_FILE = Path("output/node_history.json")
-
-
-def load_node_history() -> dict[str, int]:
-    """加载历史节点记录，返回 {fingerprint: 存活轮次}"""
-    if not HISTORY_FILE.exists():
-        return {}
-    try:
-        with HISTORY_FILE.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-        return data.get("nodes", {})
-    except Exception:
-        return {}
-
-
-def save_node_history(metrics: list[ProxyMetric]) -> None:
-    """保存当前轮次节点记录"""
-    history = load_node_history()
-    new_history: dict[str, int] = {}
-
-    for m in metrics[:TOP_N]:
-        fp = proxy_fingerprint(m.proxy)
-        prev_rounds = history.get(fp, 0)
-        new_history[fp] = min(prev_rounds + 1, 3)  # 最多记录3轮
-
-    # 历史节点衰减：之前出现过的节点如果本轮不在TopN，轮次-1
-    current_fps = {proxy_fingerprint(m.proxy) for m in metrics[:TOP_N]}
-    for fp, rounds in history.items():
-        if fp not in current_fps and rounds > 1:
-            new_history[fp] = rounds - 1
-
-    HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with HISTORY_FILE.open("w", encoding="utf-8") as f:
-        json.dump({"nodes": new_history, "updated": datetime.now(timezone.utc).isoformat()}, f, ensure_ascii=False, indent=2)
-
-
-def apply_stability_bonus(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
-    """为跨轮次稳定存活的节点加分"""
-    history = load_node_history()
-    if not history:
-        print("[INFO] 无历史节点记录，跳过稳定性加分")
-        return metrics
-
-    stable_count = 0
-    for m in metrics:
-        fp = proxy_fingerprint(m.proxy)
-        rounds = history.get(fp, 0)
-        if rounds >= 2:
-            # 存活2轮 +20%，3轮 +30%
-            bonus = 1.0 + rounds * 0.1
-            m.health_score *= bonus
-            stable_count += 1
-
-    print(f"[INFO] 稳定性加分: {stable_count} 个历史存活节点获得加分")
-    metrics.sort(key=lambda m: m.health_score, reverse=True)
-    return metrics
-
-
-def select_region_diverse(metrics: list[ProxyMetric], top_n: int) -> list[ProxyMetric]:
-    """按地区多样性选择节点，确保亚洲地区有足够代表，避免 US 节点霸榜"""
-    if top_n <= 0 or len(metrics) <= top_n:
-        return list(metrics)
-
-    # 按地区分组，每组内按评分排序
-    by_region: dict[str, list[ProxyMetric]] = {}
-    for m in metrics:
-        by_region.setdefault(m.region, []).append(m)
-    for region in by_region:
-        by_region[region].sort(key=lambda m: m.health_score, reverse=True)
-
-    selected: list[ProxyMetric] = []
-    selected_names: set[str] = set()
-
-    # 优先地区配额：HK, JP, SG 各取 top 3，TW, KR 各取 top 2
-    quotas = {"HK": 3, "JP": 3, "SG": 3, "TW": 2, "KR": 2}
-    for region, quota in quotas.items():
-        for m in by_region.get(region, [])[:quota]:
-            if m.proxy["name"] not in selected_names:
-                selected.append(m)
-                selected_names.add(m.proxy["name"])
-
-    # 如果已满 top_n，截断
-    if len(selected) >= top_n:
-        selected.sort(key=lambda m: m.health_score, reverse=True)
-        return selected[:top_n]
-
-    # 剩余名额：按评分从高到低补齐（跳过已选中的）
-    remaining = [m for m in metrics if m.proxy["name"] not in selected_names]
-    remaining.sort(key=lambda m: m.health_score, reverse=True)
-    for m in remaining:
-        if len(selected) >= top_n:
-            break
-        selected.append(m)
-
-    selected.sort(key=lambda m: m.health_score, reverse=True)
-    return selected
+def find_free_port() -> int:
+    """找一个空闲端口"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        return int(sock.getsockname()[1])
 
 
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
-    """生成Clash配置文件（输出全部通过测试的节点，与原作者一致）"""
+    """生成Clash配置文件（与原项目一致：输出全部通过节点 + 性能优化配置）"""
     metrics.sort(key=lambda m: m.health_score, reverse=True)
-    # Clash 输出全部通过节点，不做 TOP_N 截断（与原作者项目一致）
     valid_metrics = metrics
 
     if not valid_metrics:
@@ -921,113 +646,77 @@ def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
 
     config = {
         "mixed-port": 7890,
-        "allow-lan": False,
+        "allow-lan": True,
         "bind-address": "*",
         "mode": "rule",
         "log-level": "info",
-        "ipv6": False,
+        "ipv6": True,
+        "unified-delay": True,
+        "tcp-concurrent": True,
+        "global-client-fingerprint": "chrome",
         "external-controller": "127.0.0.1:9090",
 
         "proxies": proxies,
 
         "proxy-groups": [
             {
-                "name": "PROXY",
-                "type": "select",
-                "proxies": ["AUTO-FAST", "FALLBACK"] + proxy_names,
-            },
-            {
                 "name": "AUTO-FAST",
                 "type": "url-test",
-                "proxies": proxy_names[:50] or proxy_names,
+                "proxies": proxy_names,
                 "url": TEST_URL,
-                "interval": 300,
-                "tolerance": 50,
+                "interval": 120,
+            },
+            {
+                "name": "HK-POOL",
+                "type": "url-test",
+                "proxies": hk_proxies or proxy_names[:5],
+                "url": TEST_URL,
+                "interval": 120,
+            },
+            {
+                "name": "JP-POOL",
+                "type": "url-test",
+                "proxies": jp_proxies or proxy_names[:5],
+                "url": TEST_URL,
+                "interval": 120,
+            },
+            {
+                "name": "US-POOL",
+                "type": "url-test",
+                "proxies": us_proxies or proxy_names[:5],
+                "url": TEST_URL,
+                "interval": 120,
+            },
+            {
+                "name": "AI-POOL",
+                "type": "url-test",
+                "proxies": ai_proxies or proxy_names[:5],
+                "url": TEST_URL,
+                "interval": 120,
             },
             {
                 "name": "FALLBACK",
                 "type": "fallback",
-                "proxies": proxy_names or ["DIRECT"],
+                "proxies": ["AUTO-FAST", "HK-POOL", "JP-POOL", "US-POOL"],
                 "url": TEST_URL,
-                "interval": 300,
+                "interval": 120,
+            },
+            {
+                "name": "PROXY",
+                "type": "select",
+                "proxies": ["AUTO-FAST", "FALLBACK"],
             },
         ],
 
         "rules": [
-            # AI服务规则
             "DOMAIN-SUFFIX,openai.com,AI-POOL",
             "DOMAIN-SUFFIX,chatgpt.com,AI-POOL",
             "DOMAIN-SUFFIX,claude.ai,AI-POOL",
             "DOMAIN-SUFFIX,anthropic.com,AI-POOL",
-            "DOMAIN-SUFFIX,bard.google.com,AI-POOL",
-
-            # Google服务
-            "DOMAIN-SUFFIX,google.com,PROXY",
-            "DOMAIN-SUFFIX,googleapis.com,PROXY",
-            "DOMAIN-SUFFIX,gstatic.com,PROXY",
-
-            # GitHub
-            "DOMAIN-SUFFIX,github.com,PROXY",
-            "DOMAIN-SUFFIX,githubusercontent.com,PROXY",
-
-            # 国内直连
-            "DOMAIN-SUFFIX,cn,DIRECT",
-            "DOMAIN-KEYWORD,baidu,DIRECT",
-            "DOMAIN-KEYWORD,taobao,DIRECT",
-            "DOMAIN-KEYWORD,alipay,DIRECT",
-            "DOMAIN-KEYWORD,tmall,DIRECT",
-            "DOMAIN-KEYWORD,jd.com,DIRECT",
-            "DOMAIN-KEYWORD,bilibili,DIRECT",
-            "DOMAIN-KEYWORD,163.com,DIRECT",
-            "DOMAIN-KEYWORD,qq.com,DIRECT",
-            "DOMAIN-KEYWORD,weixin,DIRECT",
-
-            # GeoIP规则
             "GEOIP,CN,DIRECT",
-
-            # 最终匹配
             "MATCH,PROXY",
         ],
     }
-
-    # 添加地区分组
-    if hk_proxies:
-        config["proxy-groups"].append({
-            "name": "HK-POOL",
-            "type": "url-test",
-            "proxies": hk_proxies,
-            "url": TEST_URL,
-            "interval": 300,
-        })
-
-    if jp_proxies:
-        config["proxy-groups"].append({
-            "name": "JP-POOL",
-            "type": "url-test",
-            "proxies": jp_proxies,
-            "url": TEST_URL,
-            "interval": 300,
-        })
-
-    if us_proxies:
-        config["proxy-groups"].append({
-            "name": "US-POOL",
-            "type": "url-test",
-            "proxies": us_proxies,
-            "url": TEST_URL,
-            "interval": 300,
-        })
-
-    if ai_proxies:
-        config["proxy-groups"].append({
-            "name": "AI-POOL",
-            "type": "url-test",
-            "proxies": ai_proxies,
-            "url": TEST_URL,
-            "interval": 300,
-        })
-        # 更新PROXY组的选项
-        config["proxy-groups"][0]["proxies"] = ["AUTO-FAST", "FALLBACK", "AI-POOL", "HK-POOL", "JP-POOL", "US-POOL"] + proxy_names
 
     return config
 
@@ -1254,7 +943,7 @@ def generate_shadowrocket_sub(proxies: list[dict[str, Any]]) -> str:
 
 
 def main() -> None:
-    """主函数（简化版，对齐参考项目基线）"""
+    """主函数（与原项目一致：全节点 mihomo 测试 + 输出全部通过节点）"""
     print(f"=== Free Proxy Grab Node {VERSION} ===")
     print(f"开始时间: {datetime.now(timezone.utc).isoformat()}")
 
@@ -1262,12 +951,7 @@ def main() -> None:
     total_collected, proxies = collect_proxies()
     print(f"[OK] 收集到 {total_collected} 个节点，去重后 {len(proxies)} 个")
 
-    # 限制mihomo精测节点数（过多会导致mihomo进程崩溃）
-    if MAX_CANDIDATES > 0 and len(proxies) > MAX_CANDIDATES:
-        proxies = proxies[:MAX_CANDIDATES]
-        print(f"[INFO] 节点过多，限制为 {MAX_CANDIDATES} 个进入mihomo精测")
-
-    # mihomo 真实代理延迟测试
+    # mihomo 真实代理延迟测试（所有节点直接进 mihomo，与原项目一致）
     metrics: list[ProxyMetric] = []
     if proxies:
         try:
@@ -1286,20 +970,17 @@ def main() -> None:
         _empty_output()
         return
 
-    # 合并中国线路测试结果（如有部署云服务器）
-    metrics = merge_china_results(metrics)
-
     metrics.sort(key=lambda m: m.health_score, reverse=True)
 
-    # 生成Clash配置
+    # 生成Clash配置（输出全部通过节点）
     config = generate_clash_config(metrics)
     CLASH_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with CLASH_OUTPUT.open("w", encoding="utf-8") as f:
         yaml.safe_dump(config, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT} ({len(config.get('proxies', []))} 节点)")
 
-    # 生成Shadowrocket + V2Ray订阅（地区多样性选择，避免 US 霸榜）
-    rocket_proxies = [m.proxy for m in select_region_diverse(metrics, TOP_N)] if TOP_N > 0 else [m.proxy for m in metrics]
+    # 生成Shadowrocket + V2Ray订阅（输出全部通过节点，与原项目一致）
+    rocket_proxies = [m.proxy for m in metrics]
     rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
