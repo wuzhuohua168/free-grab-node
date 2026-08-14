@@ -78,16 +78,6 @@ SOURCE_GROUPS = [
         "primary": "https://raw.githubusercontent.com/PuddinCat/BestClash/refs/heads/main/proxies.yaml",
         "fallbacks": [],
     },
-    {
-        "name": "dongchengjie airport",
-        "primary": "https://raw.githubusercontent.com/dongchengjie/airport/refs/heads/main/subs/merged/tested_within.yaml",
-        "fallbacks": [],
-    },
-    {
-        "name": "zhuhaiuk free-nodes",
-        "primary": "https://raw.githubusercontent.com/zhuhaiuk/free-nodes/main/clash_config.yaml",
-        "fallbacks": [],
-    },
 ]
 
 # 支持的代理类型
@@ -314,24 +304,68 @@ def proxy_fingerprint(proxy: dict[str, Any]) -> str:
 
 
 def detect_region(proxy: dict[str, Any]) -> str:
-    """检测代理节点地区"""
-    name = str(proxy.get("name", "")).upper()
+    """检测代理节点地区（正则+emoji+unicode，与参考项目一致）"""
+    name = str(proxy.get("name", ""))
+    return detect_region_by_name(name)
 
-    # 根据节点名称识别地区
-    if any(keyword in name for keyword in ["香港", "HK", "HONGKONG", "HONG KONG"]):
-        return "HK"
-    elif any(keyword in name for keyword in ["日本", "JP", "JAPAN", "东京", "TOKYO"]):
-        return "JP"
-    elif any(keyword in name for keyword in ["美国", "US", "USA", "UNITED STATES"]):
-        return "US"
-    elif any(keyword in name for keyword in ["台湾", "TW", "TAIWAN"]):
-        return "TW"
-    elif any(keyword in name for keyword in ["新加坡", "SG", "SINGAPORE"]):
-        return "SG"
-    elif any(keyword in name for keyword in ["韩国", "KR", "KOREA", "首尔", "SEOUL"]):
-        return "KR"
-    else:
-        return "OTHER"
+
+def detect_region_by_name(name: str) -> str:
+    """根据节点名称检测地区"""
+    text = name.lower()
+    patterns = {
+        "HK": (
+            "regex:\\bhk\\b",
+            "hong kong",
+            "\\u9999\\u6e2f",
+            "\U0001f1ed\U0001f1f0",
+        ),
+        "JP": (
+            "regex:\\bjp\\b",
+            "japan",
+            "\\u65e5\\u672c",
+            "\U0001f1ef\U0001f1f5",
+        ),
+        "US": (
+            "regex:\\bus\\b",
+            "regex:\\busa\\b",
+            "united states",
+            "america",
+            "\\u7f8e\\u56fd",
+            "\\u7f8e\\u570b",
+            "\U0001f1fa\U0001f1f8",
+        ),
+        "SG": (
+            "regex:\\bsg\\b",
+            "singapore",
+            "\\u65b0\\u52a0\\u5761",
+            "\U0001f1f8\U0001f1ec",
+        ),
+        "TW": (
+            "regex:\\btw\\b",
+            "taiwan",
+            "\\u53f0\\u6e7e",
+            "\U0001f1f9\U0001f1fc",
+        ),
+        "KR": (
+            "regex:\\bkr\\b",
+            "korea",
+            "\\ud55c\\uad6d",
+            "\\u97e9\\u56fd",
+            "\\uc11c\\uc6b8",
+            "\U0001f1f0\U0001f1f7",
+        ),
+    }
+    for region, tokens in patterns.items():
+        for token in tokens:
+            if token.startswith("regex:"):
+                if re.search(token.removeprefix("regex:"), text):
+                    return region
+                continue
+            if token.startswith("\\u"):
+                token = token.encode("utf-8").decode("unicode_escape")
+            if token in text:
+                return region
+    return "OTHER"
 
 
 # 代理可用性测试URL（与参考项目一致，单URL测试）
@@ -1039,6 +1073,13 @@ def _vmess_to_uri(proxy: dict[str, Any]) -> str:
     uuid = str(proxy.get("uuid", ""))
     name = str(proxy.get("name", ""))
 
+    # 修正 tls 字段：Clash YAML 中 tls 可能是 True/False 布尔值
+    tls_val = proxy.get("tls", "")
+    if tls_val is True:
+        tls_val = "tls"
+    elif tls_val is False:
+        tls_val = ""
+
     config = {
         "v": "2",
         "ps": name,
@@ -1051,7 +1092,7 @@ def _vmess_to_uri(proxy: dict[str, Any]) -> str:
         "type": str(proxy.get("type", "none")),
         "host": str(proxy.get("host", proxy.get("ws-opts", {}).get("headers", {}).get("Host", "") if isinstance(proxy.get("ws-opts"), dict) else "")),
         "path": str(proxy.get("path", proxy.get("ws-opts", {}).get("path", "/") if isinstance(proxy.get("ws-opts"), dict) else "/")),
-        "tls": str(proxy.get("tls", "")),
+        "tls": str(tls_val),
         "sni": str(proxy.get("sni", proxy.get("servername", ""))),
         "alpn": str(proxy.get("alpn", "")),
         "fp": str(proxy.get("fp", proxy.get("fingerprint", ""))),
@@ -1066,10 +1107,17 @@ def _vless_to_uri(proxy: dict[str, Any]) -> str:
     port = proxy.get("port", 0)
     name = str(proxy.get("name", ""))
 
+    # 修正 tls 字段：Clash YAML 中 tls 可能是 True/False 布尔值
+    tls_val = proxy.get("tls", "none")
+    if tls_val is True:
+        tls_val = "tls"
+    elif tls_val is False:
+        tls_val = "none"
+
     params = []
     params.append(f"type={proxy.get('network', 'tcp')}")
-    params.append(f"security={proxy.get('tls', 'none')}")
-    if proxy.get("tls") == "reality":
+    params.append(f"security={tls_val}")
+    if tls_val == "reality":
         params.append(f"flow={proxy.get('flow', '')}")
         params.append(f"pbk={proxy.get('pbk', '')}")
         params.append(f"sid={proxy.get('sid', '')}")
@@ -1077,7 +1125,13 @@ def _vless_to_uri(proxy: dict[str, Any]) -> str:
         params.append(f"path={proxy.get('path', '/')}")
         params.append(f"host={proxy.get('host', '')}")
     if proxy.get("sni"):
-        params.append(f"sni={proxy.get('sni')}")
+        sni = str(proxy.get("sni", ""))
+        # 清理 sni：移除协议前缀和路径，只保留域名
+        sni = sni.replace("https://", "").replace("http://", "")
+        sni = sni.split("/")[0].split("#")[0]
+        sni = "".join(c for c in sni if ord(c) < 128)  # 去除非ASCII字符
+        if sni:
+            params.append(f"sni={sni}")
     params.append(f"encryption={proxy.get('encryption', 'none')}")
     params.append(f"fp={proxy.get('fp', proxy.get('fingerprint', ''))}")
 
@@ -1112,7 +1166,13 @@ def _hysteria_to_uri(proxy: dict[str, Any]) -> str:
     if proxy.get("insecure"):
         params.append("insecure=1")
     if proxy.get("sni"):
-        params.append(f"sni={proxy.get('sni')}")
+        sni = str(proxy.get("sni", ""))
+        # 清理 sni：移除协议前缀和路径，只保留域名
+        sni = sni.replace("https://", "").replace("http://", "")
+        sni = sni.split("/")[0].split("#")[0]
+        sni = "".join(c for c in sni if ord(c) < 128)  # 去除非ASCII字符
+        if sni:
+            params.append(f"sni={sni}")
 
     query = "?" + "&".join(params) if params else ""
 
