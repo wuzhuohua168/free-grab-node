@@ -33,6 +33,7 @@ import yaml
 VERSION = "v1.0"
 CLASH_OUTPUT = Path("output/clash.yaml")
 ROCKET_OUTPUT = Path("output/rocket.txt")
+V2RAY_OUTPUT = Path("output/v2ray.txt")
 TEST_URL = "http://www.gstatic.com/generate_204"
 SOURCE_TIMEOUT = 25
 LATENCY_TIMEOUT_MS = 6000
@@ -859,6 +860,11 @@ def main() -> None:
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
     print(f"[OK] Shadowrocket订阅已生成: {ROCKET_OUTPUT} ({len(rocket_proxies)} 节点)")
+
+    # 生成V2Ray订阅（格式与Shadowrocket相同，base64编码的URI列表）
+    with V2RAY_OUTPUT.open("w", encoding="utf-8") as f:
+        f.write(rocket_content)
+    print(f"[OK] V2Ray订阅已生成: {V2RAY_OUTPUT} ({len(rocket_proxies)} 节点)")
     print(f"完成时间: {datetime.now(timezone.utc).isoformat()}")
 
     # 输出统计信息

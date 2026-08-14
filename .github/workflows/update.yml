@@ -38,6 +38,7 @@ jobs:
           mkdir -p docs
           cp output/clash.yaml docs/clash.yaml
           cp output/rocket.txt docs/rocket.txt
+          cp output/v2ray.txt docs/v2ray.txt
           touch docs/.nojekyll
 
       - name: Commit and push changes
@@ -45,7 +46,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add output/clash.yaml output/rocket.txt docs/clash.yaml docs/rocket.txt docs/.nojekyll
+          git add output/clash.yaml output/rocket.txt output/v2ray.txt docs/clash.yaml docs/rocket.txt docs/v2ray.txt docs/.nojekyll
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
@@ -59,8 +60,10 @@ jobs:
           # 检查所有输出文件是否存在且有效
           test -s output/clash.yaml
           test -s output/rocket.txt
+          test -s output/v2ray.txt
           test -s docs/clash.yaml
           test -s docs/rocket.txt
+          test -s docs/v2ray.txt
 
           # 验证Clash YAML格式
           python - <<'PY'
