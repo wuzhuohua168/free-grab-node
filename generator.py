@@ -287,6 +287,44 @@ def health_score(name: str, latency: int, region: str) -> float:
     return 1.0 / max(latency, 1)
 
 
+def merge_china_results(metrics: list[ProxyMetric]) -> list[ProxyMetric]:
+    """合并中国电信/移动线路测试结果，提升双向可通节点的评分"""
+    results_path = Path("deploy/results.json")
+    if not results_path.exists():
+        print("[INFO] 无中国线路测试结果，跳过合并")
+        return metrics
+
+    try:
+        with results_path.open("r", encoding="utf-8") as f:
+            china_data = json.load(f)
+    except Exception as e:
+        print(f"[WARN] 读取中国线路结果失败: {e}")
+        return metrics
+
+    results = china_data.get("results", {})
+    if not results:
+        print("[INFO] 中国线路测试结果为空")
+        return metrics
+
+    # 建立 name -> passed 映射
+    china_passed: set[str] = set()
+    for name, vals in results.items():
+        if vals.get("connectivity") or vals.get("google"):
+            china_passed.add(name)
+
+    print(f"[INFO] 中国线路通过节点: {len(china_passed)}")
+
+    if not china_passed:
+        return metrics
+
+    # 对通过中国线路测试的节点提升评分
+    for m in metrics:
+        if m.proxy["name"] in china_passed:
+            m.health_score *= 2.0  # 通过中国线路的节点评分翻倍
+
+    return metrics
+
+
 # ---- Mihomo 代理引擎测试 ----
 
 def _tcp_quick_test(proxy: dict[str, Any]) -> tuple[dict[str, Any], int] | None:
@@ -882,6 +920,9 @@ def main() -> None:
 
     # 测试节点延迟
     metrics = benchmark_proxies(proxies)
+
+    # 合并中国电信/移动线路测试结果（提升双向可通节点评分）
+    metrics = merge_china_results(metrics)
 
     # 生成Clash配置
     config = generate_clash_config(metrics)
