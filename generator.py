@@ -264,20 +264,78 @@ def detect_region(proxy: dict[str, Any]) -> str:
         return "OTHER"
 
 
+# 代理可用性测试URL
+PROXY_TEST_URL = "http://www.gstatic.com/generate_204"
+# 有效地区列表
+VALID_REGIONS = {"HK", "JP", "SG", "US", "KR", "TW"}
+
+
 def test_proxy_delay(proxy: dict[str, Any]) -> int:
-    """测试代理节点TCP连通性"""
+    """测试代理节点真实可用性（TCP连通 + HTTP穿越验证）"""
     server = str(proxy.get("server", ""))
     port = proxy.get("port", 0)
+    proxy_type = str(proxy.get("type", "")).lower()
+
+    # 第一步：TCP连通性测试
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5.0)
         start = time.time()
         sock.connect((server, port))
-        latency = int((time.time() - start) * 1000)
+        tcp_latency = int((time.time() - start) * 1000)
         sock.close()
-        return latency
     except Exception:
         return 9999
+
+    # 0ms TCP延迟 = CDN节点，直接丢弃
+    if tcp_latency == 0:
+        return 9999
+
+    # 第二步：HTTP代理真实穿越测试
+    if proxy_type == "http":
+        try:
+            proxy_url = f"http://{server}:{port}"
+            username = proxy.get("username", "")
+            password = proxy.get("password", "")
+            if username:
+                proxy_url = f"http://{username}:{password}@{server}:{port}"
+
+            start = time.time()
+            resp = requests.get(
+                PROXY_TEST_URL,
+                proxies={"http": proxy_url},
+                timeout=6,
+                headers={"User-Agent": f"free-grab-node/{VERSION}"},
+            )
+            if resp.status_code in (200, 204):
+                return int((time.time() - start) * 1000)
+        except Exception:
+            pass
+        return 9999
+
+    # SOCKS5代理穿越测试
+    if proxy_type == "socks5":
+        try:
+            import socks as pysocks
+
+            s = pysocks.socksocket()
+            s.set_proxy(pysocks.SOCKS5, server, port)
+            s.settimeout(6)
+            start = time.time()
+            s.connect(("www.gstatic.com", 80))
+            s.sendall(b"GET /generate_204 HTTP/1.0\r\nHost: www.gstatic.com\r\n\r\n")
+            resp = s.recv(1024)
+            s.close()
+            if b"204" in resp or b"200" in resp:
+                return int((time.time() - start) * 1000)
+        except Exception:
+            pass
+        return 9999
+
+    # 其他协议：TCP连通 + 非0ms + 延迟<600ms 即视为可用
+    if tcp_latency < 600:
+        return tcp_latency
+    return 9999
 
 
 def benchmark_proxies(proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
@@ -327,12 +385,16 @@ def benchmark_proxies(proxies: list[dict[str, Any]]) -> list[ProxyMetric]:
 
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
     """生成Clash配置文件"""
-    # 过滤掉延迟过高的节点（超过600ms）
-    valid_metrics = [m for m in metrics if m.latency < 600]
+    # 过滤：延迟600ms内 + 非0ms(CDN) + 有效地区
+    valid_metrics = [m for m in metrics if 0 < m.latency < 600 and m.region in VALID_REGIONS]
 
     if not valid_metrics:
-        print("[WARN] 没有有效的代理节点")
-        valid_metrics = metrics[:10]  # 至少保留前10个节点
+        print("[WARN] 没有有效的代理节点，使用全部节点")
+        valid_metrics = metrics[:50]
+
+    # 按健康评分排序，取前300个
+    valid_metrics.sort(key=lambda m: m.health_score, reverse=True)
+    valid_metrics = valid_metrics[:300]
 
     proxies = [m.proxy for m in valid_metrics]
     proxy_names = [p["name"] for p in proxies]
@@ -679,14 +741,16 @@ def main() -> None:
 
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT}")
 
-    # 生成Shadowrocket订阅（过滤超时节点，按健康评分排序）
-    # 只保留TCP连通成功的节点（延迟 < 600ms）
-    valid_metrics = [m for m in metrics if m.latency < 600]
-    print(f"[INFO] TCP连通: {len(valid_metrics)}/{len(metrics)} 个节点")
+    # 生成Shadowrocket订阅（过滤超时、CDN、无效地区节点，按健康评分排序）
+    # 只保留可用节点（延迟 < 600ms 且非9999超时）
+    valid_metrics = [m for m in metrics if 0 < m.latency < 600]
+    # 仅保留有效地区节点
+    valid_metrics = [m for m in valid_metrics if m.region in VALID_REGIONS]
+    print(f"[INFO] 有效节点: {len(valid_metrics)}/{len(metrics)} (延迟<600ms, 非CDN, 有效地区)")
 
-    # 按健康评分排序，取前500个节点
+    # 按健康评分排序，取前200个节点
     valid_metrics.sort(key=lambda m: m.health_score, reverse=True)
-    rocket_proxies = [m.proxy for m in valid_metrics[:500]]
+    rocket_proxies = [m.proxy for m in valid_metrics[:200]]
     rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
         f.write(rocket_content)
