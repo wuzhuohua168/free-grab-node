@@ -9,9 +9,21 @@ tcp-concurrent: true
 global-client-fingerprint: chrome
 external-controller: 127.0.0.1:9090
 proxies:
+- name: JP - zhuhai.uk 37
+  type: trojan
+  server: bright-quagga.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
 - name: JP - zhuhai.uk 72
   type: trojan
   server: bright-buffalo.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: JP - zhuhai.uk 44
+  type: trojan
+  server: emerging-porpoise.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -58,36 +70,32 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇭🇰 香港 | HKG 6
-  server: 202.146.222.89
+  server: 156.248.10.58
   port: 443
-  type: hysteria2
-  password: H7mP2xY9kJ4nQ8wR5tF6vB3z
-  auth: H7mP2xY9kJ4nQ8wR5tF6vB3z
-  sni: https://t.me/clashv8🇨🇳
-  skip-cert-verify: true
+  type: vless
+  uuid: 93a9d63a-03b8-4167-92bd-3fa932af1c91
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: EXIEsAJq-s30mA0r997iwrR8ijvGLZ7DOTkr_R39QCE
+    short-id: 54fc3827c8
+  servername: nono.hhhkkhktt.xyz
+  client-fingerprint: safari
+  network: tcp
+  udp: true
 - name: 🇭🇰 香港 | HKG 7
-  server: v9.hdacd.com
-  port: 30809
-  type: vmess
-  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
-  alterId: 2
-  cipher: auto
-  tls: false
-  skip-cert-verify: true
-- name: 🇯🇵 日本 | JPN 5
-  server: 151.101.193.242
-  port: 443
-  type: trojan
-  password: MITIVPN
-  sni: mitivpn.lifestyle
-  alpn:
-  - http/1.1
-  skip-cert-verify: true
-  network: ws
-  ws-opts:
-    path: /---@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN/D-e2@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN
-    headers:
-      Host: mitivpn.lifestyle
+  server: hy2-tw.starq.me
+  port: 24443
+  type: vless
+  uuid: a68d59e6-bc1e-47ed-91bf-c3e02b18e5df
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: 09Cv8GzDb5G9R9MS37ajZQ8o489874sF9umFuNdCeEc
+    short-id: ba2e8b0452447037
+  servername: www.cloudflare.com
+  client-fingerprint: chrome
+  network: tcp
   udp: true
 - name: JP - zhuhai.uk 26
   type: trojan
@@ -95,6 +103,14 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇯🇵 日本 | JPN 5
+  server: 154.31.114.168
+  port: 50160
+  type: hysteria2
+  password: c3e6fd601b53d080ed5099cbf325dede
+  auth: c3e6fd601b53d080ed5099cbf325dede
+  sni: 154-31-114-168.liao.kdns.fr
+  skip-cert-verify: true
 - name: 🇭🇰 香港 | HKG 2
   server: 2c.fast9988.com
   port: 50887
@@ -104,11 +120,10 @@ proxies:
   skip-cert-verify: true
   udp: true
 - name: HK - zhuhai.uk 06
-  type: trojan
-  server: dynamic-grubworm.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
+  type: socks5
+  server: 59.38.113.185
+  port: 20000
+  username: Og==
 - name: JP - zhuhai.uk 12
   type: trojan
   server: noted-cougar.rooster465.autos
@@ -133,18 +148,6 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: HK - zhuhai.uk 05
-  type: vmess
-  server: planb.mojcn.com.linuxlh.xin
-  port: 16632
-  uuid: fd15f1d9-a3f5-41e3-a755-f3e7bb32d78d
-  alterId: 0
-  cipher: auto
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: 67102451140aedb1cbfa18e08d87aeeb.mobgslb.tbcache.com
 - name: SG - zhuhai.uk 23
   type: trojan
   server: stable-racer.rooster465.autos
@@ -152,15 +155,27 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇭🇰 香港 | HKG 4
-  server: growing-oyster.rooster465.autos
+  server: 43.132.192.16
+  port: 9527
+  type: vmess
+  uuid: ae862e1d-3b8c-443a-027b-37c6c69ef43c
+  alterId: 0
+  cipher: chacha20-poly1305
+  tls: false
+  alpn:
+  - ''
+  skip-cert-verify: true
+  udp: true
+- name: 🇯🇵 日本 | JPN 12
+  server: funny-squid.rooster465.autos
   port: 443
   type: trojan
   password: FH72359861
   skip-cert-verify: true
   udp: true
-- name: JP - zhuhai.uk 15
+- name: HK - zhuhai.uk 07
   type: trojan
-  server: loyal-killdeer.rooster465.autos
+  server: smiling-ray.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -176,33 +191,15 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: HK - zhuhai.uk 07
-  type: trojan
-  server: smiling-ray.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: JP - zhuhai.uk 41
   type: trojan
   server: moral-buzzard.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: JP - zhuhai.uk 19
-  type: trojan
-  server: internal-mongoose.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: JP - zhuhai.uk 23
   type: trojan
   server: needed-gelding.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: JP - zhuhai.uk 71
-  type: trojan
-  server: wise-gibbon.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -223,6 +220,29 @@ proxies:
   server: closing-falcon.rooster465.autos
   port: 443
   password: FH72359861
+  udp: true
+- name: 🇯🇵 日本 | JPN 11
+  server: 151.101.193.242
+  port: 443
+  type: trojan
+  password: MITIVPN
+  sni: mitivpn.lifestyle
+  alpn:
+  - http/1.1
+  skip-cert-verify: true
+  network: ws
+  ws-opts:
+    path: /---@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN/D-e2@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN/---@MiTiVPN---@MiTiVPN
+    headers:
+      Host: mitivpn.lifestyle
+  udp: true
+- name: 🇯🇵 日本 | JPN 10
+  server: endless-kiwi.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  sni: endless-kiwi.rooster465.autos
+  skip-cert-verify: true
   udp: true
 - name: JP - zhuhai.uk 18
   type: trojan
@@ -272,26 +292,26 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: JP - zhuhai.uk 02
+  type: trojan
+  server: living-hagfish.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: 🇯🇵 日本 | JPN 8
+  server: champion-panther.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  sni: champion-panther.rooster465.autos
+  skip-cert-verify: true
+  udp: true
 - name: JP - zhuhai.uk 22
   type: trojan
   server: relaxing-marten.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: 🇯🇵 日本 | JPN 8
-  server: bright-quagga.rooster465.autos
-  port: 443
-  type: trojan
-  password: FH72359861
-  skip-cert-verify: true
-- name: 🇯🇵 日本 | JPN 9
-  server: 178-253-245-144.liao.kdns.fr
-  port: 50160
-  type: hysteria2
-  password: f1c0f5fdd23e56602ca46b8aa5e93d35
-  auth: f1c0f5fdd23e56602ca46b8aa5e93d35
-  sni: 178-253-245-144.liao.kdns.fr
-  skip-cert-verify: true
 - name: SG - zhuhai.uk 36
   type: trojan
   server: funny-hawk.rooster465.autos
@@ -299,41 +319,34 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇯🇵 日本 | JPN 2
-  server: emerging-porpoise.rooster465.autos
+  server: internal-mongoose.rooster465.autos
   port: 443
   type: trojan
   password: FH72359861
+  sni: internal-mongoose.rooster465.autos
   skip-cert-verify: true
-- name: 🇯🇵 日本 | JPN 7
-  server: 153.76.248.251
-  port: 443
-  type: vless
-  uuid: 423b1d79-08c4-403f-9d5e-c541f791b55f
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: eaRNeC8fccrx0nBNvBpAXZgK4m4FxfnQ-t0W7NOM7mU
-    short-id: e53048e82bb20077
-  servername: asia.cendora.ru
-  client-fingerprint: edge
-  network: tcp
   udp: true
 - name: 🇯🇵 日本 | JPN 6
-  server: endless-kiwi.rooster465.autos
+  server: light-filly.rooster465.autos
   port: 443
   type: trojan
   password: FH72359861
-  sni: endless-kiwi.rooster465.autos
   skip-cert-verify: true
   udp: true
 - name: 🇯🇵 日本 | JPN 3
-  server: 154.31.114.168
-  port: 50160
-  type: hysteria2
-  password: c3e6fd601b53d080ed5099cbf325dede
-  auth: c3e6fd601b53d080ed5099cbf325dede
-  sni: 154-31-114-168.liao.kdns.fr
-  skip-cert-verify: true
+  server: 8.216.82.150
+  port: 13779
+  type: vless
+  uuid: 928e6cce-8ced-4243-9a48-a6642edd09b0
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: llTyp52oRXnJmQ3I9UUrmlwbMA79B-wLCRHCu-8dLGg
+    short-id: af1bdd293097b664
+  servername: tesla.com
+  client-fingerprint: chrome
+  network: tcp
+  udp: true
 - name: JP - zhuhai.uk 74
   type: trojan
   server: better-molly.rooster465.autos
@@ -376,6 +389,23 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇭🇰 香港 | HKG 5
+  server: t.cnmjcn.cyou
+  port: 16632
+  type: vmess
+  uuid: d52b72b0-a509-490a-adae-23da2348d29c
+  alterId: 0
+  cipher: auto
+  tls: false
+  alpn:
+  - ''
+  skip-cert-verify: true
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: 82d16f3a12ad1d0871e0270510bf2ef6.mobgslb.tbcache.com
+  udp: true
 - name: JP - zhuhai.uk 27
   type: trojan
   server: winning-shrimp.rooster465.autos
@@ -388,6 +418,29 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇭🇰 香港 | HKG 10
+  server: planb.mojcn.com.linuxlh.xin
+  port: 16632
+  type: vmess
+  uuid: fd15f1d9-a3f5-41e3-a755-f3e7bb32d78d
+  alterId: 0
+  cipher: auto
+  tls: false
+  alpn:
+  - ''
+  skip-cert-verify: true
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: 67102451140aedb1cbfa18e08d87aeeb.mobgslb.tbcache.com
+  udp: true
+- name: SG - zhuhai.uk
+  type: ss
+  server: 161.118.202.100
+  port: 56927
+  cipher: 2022-blake3-chacha20-poly1305
+  password: ET6m0QepafPHafDnv4ontoJMPwmALSrkyK9BgpvrBfs=
 - name: JP - zhuhai.uk 36
   type: trojan
   server: tight-fawn.rooster465.autos
@@ -400,34 +453,19 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇸🇬 新加坡 | SGP 3
-  server: charming-ox.rooster465.autos
-  port: 443
-  type: trojan
-  password: FH72359861
-  sni: charming-ox.rooster465.autos
-  skip-cert-verify: true
-  udp: true
 - name: JP - zhuhai.uk 33
   type: trojan
   server: brief-hare.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: JP - zhuhai.uk 60
-  type: trojan
-  server: champion-panther.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: 🇯🇵 日本 | JPN 4
-  server: 140-238-43-0.liao.kdns.fr
-  port: 50160
-  type: hysteria2
-  password: 3489a008067e4b789cd91f3f0d3ece47
-  auth: 3489a008067e4b789cd91f3f0d3ece47
-  sni: 140-238-43-0.liao.kdns.fr
+  server: wise-gibbon.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
   skip-cert-verify: true
+  udp: true
 - name: SG - zhuhai.uk 19
   type: trojan
   server: exciting-turtle.rooster465.autos
@@ -440,14 +478,6 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇸🇬 新加坡 | SGP
-  server: sg1.xiaoliyu.cyou
-  port: 1935
-  type: hysteria2
-  password: 1427eb10-7529-4d38-a6a2-01b337868b37
-  auth: 1427eb10-7529-4d38-a6a2-01b337868b37
-  sni: sg1.xiaoliyu.cyou
-  skip-cert-verify: true
 - name: JP - zhuhai.uk 55
   type: trojan
   server: touching-ostrich.rooster465.autos
@@ -472,28 +502,14 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇸🇬 新加坡 | SGP 6
-  server: 54.254.235.88
-  port: 443
-  type: trojan
-  password: FH72359861
-  sni: charming-ox.rooster465.autos
-  skip-cert-verify: true
 - name: 🇭🇰 香港 | HKG
-  server: 95.40.100.129
-  port: 10126
-  type: vless
-  uuid: B1BF44DF-BADD-44EE-826A-12C27206993D
-  tls: true
-  reality-opts:
-    public-key: wOu-BMrXvk9KX23JZrlpUlF4SMjDcejm0vNECdhy5xE
-    short-id: 686c0ef0
-  servername: s0.awsstatic.com
-  client-fingerprint: chrome
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: update
+  server: 8-210-142-69.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: c2601f6c59ed832f9129533608eea8eb
+  auth: c2601f6c59ed832f9129533608eea8eb
+  sni: 8-210-142-69.liao.kdns.fr
+  skip-cert-verify: true
 - name: JP - zhuhai.uk 45
   type: trojan
   server: casual-stallion.rooster465.autos
@@ -512,15 +528,15 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: JP - zhuhai.uk 31
+- name: SG - zhuhai.uk 11
   type: trojan
-  server: grateful-crawdad.rooster465.autos
+  server: charming-ox.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: JP - zhuhai.uk 25
+- name: JP - zhuhai.uk 31
   type: trojan
-  server: funny-squid.rooster465.autos
+  server: grateful-crawdad.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -574,6 +590,15 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇭🇰 香港 | HKG 11
+  server: v9.hdacd.com
+  port: 30809
+  type: vmess
+  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
+  alterId: 2
+  cipher: auto
+  tls: false
+  skip-cert-verify: true
 - name: JP - zhuhai.uk 52
   type: trojan
   server: adapting-giraffe.rooster465.autos
@@ -581,12 +606,10 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇯🇵 日本 | JPN
-  server: 185.39.31.40
-  port: 8443
-  type: hysteria2
-  password: Foc_Mcxi45rM9v3ve_N92fdrK_10_Ssc5
-  auth: Foc_Mcxi45rM9v3ve_N92fdrK_10_Ssc5
-  sni: grape-beer.yyuyy.com
+  server: loyal-killdeer.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
   skip-cert-verify: true
 - name: JP - zhuhai.uk 56
   type: trojan
@@ -606,15 +629,15 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: JP - zhuhai.uk 40
-  type: trojan
-  server: sacred-shepherd.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: JP - zhuhai.uk 64
   type: trojan
   server: equal-labrador.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: JP - zhuhai.uk 40
+  type: trojan
+  server: sacred-shepherd.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -624,31 +647,15 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇸🇬 新加坡 | SGP 4
-  server: sg3-r.link-t7.com
-  port: 10038
-  type: vless
-  uuid: F5363530-7194-486B-BF2C-9AF7E75F6543
-  tls: true
-  reality-opts:
-    public-key: wOu-BMrXvk9KX23JZrlpUlF4SMjDcejm0vNECdhy5xE
-    short-id: 686c0ef0
-  servername: d1.awsstatic.com
-  client-fingerprint: firefox
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: update
+- name: SG - zhuhai.uk 40
+  type: trojan
+  server: massive-terrapin.rooster465.autos
+  port: 443
+  password: FH72359861
   udp: true
 - name: JP - zhuhai.uk 73
   type: trojan
   server: stunning-mastodon.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: SG - zhuhai.uk 40
-  type: trojan
-  server: massive-terrapin.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -658,15 +665,16 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇭🇰 香港 | HKG 8
+  server: growing-oyster.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  skip-cert-verify: true
+  udp: true
 - name: JP - zhuhai.uk 58
   type: trojan
   server: included-hedgehog.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: JP - zhuhai.uk 48
-  type: trojan
-  server: light-filly.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -682,15 +690,15 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: JP - zhuhai.uk 24
-  type: trojan
-  server: steady-prawn.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: JP - zhuhai.uk 06
   type: trojan
   server: internal-peacock.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: JP - zhuhai.uk 24
+  type: trojan
+  server: steady-prawn.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -718,20 +726,33 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- client-fingerprint: chrome
+  name: us|b3d2|puddincat07@Telegram
+  network: ws
+  password: humanity
+  port: 443
+  server: 104.16.7.70
+  skip-cert-verify: false
+  sni: www.ignitelimit.com
+  type: trojan
+  udp: true
+  ws-opts:
+    headers:
+      User-Agent: Mozilla/5.0 (Linux; Android 7.0; BLL-L22 Build/HUAWEIBLL-L22) AppleWebKit/537.36
+        (KHTML, like Gecko) Chrome/55.0.2883.91 Mobile Safari/537.36
+    path: /assignment
 - name: US - zhuhai.uk 09
   type: trojan
   server: neutral-quail.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: 🇺🇸 美国 | USA 11
-  server: 129-146-143-124.liao.kdns.fr
-  port: 50160
-  type: hysteria2
-  password: 4fd8857a2c6af64470191e79500f42d7
-  auth: 4fd8857a2c6af64470191e79500f42d7
-  sni: 129-146-143-124.liao.kdns.fr
-  skip-cert-verify: true
+- name: US - zhuhai.uk 07
+  type: trojan
+  server: humorous-hawk.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
 - client-fingerprint: chrome
   name: us|b395|puddincat07@Telegram
   network: ws
@@ -747,12 +768,49 @@ proxies:
       User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like
         Gecko) Chrome/42.0.2311.90 Safari/537.36
     path: /assignment
+- name: 🇺🇸 美国 | USA 20
+  server: 104.19.215.97
+  port: 2087
+  type: vless
+  uuid: 77777777-8a3e-6666-b6d1-a9c5f0e8b3a2
+  tls: true
+  servername: faxf32gkfzoxqv.fx6hsv0.ccwu.cc
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: faxf32gkfzoxqv.fx6hsv0.ccwu.cc
+  udp: true
+- name: 🇺🇸 美国 | USA 9
+  server: nlgas.hambot.ru
+  port: 443
+  type: hysteria2
+  password: b268a3a1-3826-44a3-9ffb-3ac2095300ca
+  auth: b268a3a1-3826-44a3-9ffb-3ac2095300ca
+  sni: nlgas.hambot.ru
+  skip-cert-verify: true
+- name: 🇺🇸 美国 | USA 8
+  server: 139.28.168.55
+  port: 8443
+  type: hysteria2
+  password: 0wdsa_nJXEWRj9jz9J9xMgtx_n7gzfK_m8
+  auth: 0wdsa_nJXEWRj9jz9J9xMgtx_n7gzfK_m8
+  sni: grape-honk.yyuyy.com
+  skip-cert-verify: true
+- name: 🇺🇸 美国 | USA 24
+  server: 161.153.82.253
+  port: 50356
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: plOiPuT3hE6D4+jexk3dGDPQyjA68wlwEbM9QobMze8=
+  udp: true
 - client-fingerprint: chrome
-  name: us|9165|puddincat07@Telegram
+  name: us|9f71|puddincat07@Telegram
   network: ws
   password: humanity
   port: 443
-  server: 104.18.152.233
+  server: 104.17.111.8
   skip-cert-verify: false
   sni: www.ignitelimit.com
   type: trojan
@@ -760,80 +818,7 @@ proxies:
   ws-opts:
     headers:
       User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like
-        Gecko) Chrome/49.0.2623.110 Safari/537.36
-    path: /assignment
-- name: 🇺🇸 美国 | USA 26
-  server: 82.38.60.122
-  port: 8443
-  type: hysteria2
-  password: VB92_Ka9qwef143K_L23K1hz3_bF_Hz62uT_Bn1_sC
-  auth: VB92_Ka9qwef143K_L23K1hz3_bF_Hz62uT_Bn1_sC
-  sni: hopp-us.yyuyy.com
-  skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 20
-  server: 169.40.42.229
-  port: 443
-  type: vless
-  uuid: d65cc14c-f53f-4fe2-b262-97856601319c
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: e2RLf57Li_-MDZGE9ss1BWPgP54mqRb5PfXhW2jcVVg
-    short-id: c39cc7310a
-  servername: yahoo.com
-  client-fingerprint: ios
-  network: tcp
-  udp: true
-- name: 🇺🇸 美国 | USA 25
-  server: 45.78.79.106
-  port: 13779
-  type: vless
-  uuid: 928e6cce-8ced-4243-9a48-a6642edd09b0
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: llTyp52oRXnJmQ3I9UUrmlwbMA79B-wLCRHCu-8dLGg
-    short-id: af1bdd293097b664
-  servername: tesla.com
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: US - zhuhai.uk 08
-  type: trojan
-  server: dominant-jaguar.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: 🇺🇸 美国 | USA 16
-  server: 69.84.182.152
-  port: 2095
-  type: vless
-  uuid: 86c50e3a-5b87-49dd-bd20-03c7f2735e40
-  tls: false
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: download.pusytroller.gq
-  udp: true
-- alpn:
-  - h3
-  - h2
-  - http/1.1
-  client-fingerprint: chrome
-  name: us|2a14|puddincat07@Telegram
-  network: ws
-  password: humanity
-  port: 443
-  server: 172.67.221.242
-  skip-cert-verify: false
-  sni: www.ignitelimit.com
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/64.0.3282.186 Safari/537.36
+        Gecko) Chrome/52.0.2743.116 Safari/537.36
     path: /assignment
 - client-fingerprint: chrome
   name: us|cc28|puddincat07@Telegram
@@ -850,8 +835,14 @@ proxies:
       User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML,
         like Gecko) Chrome/53.0.2785.143 Safari/537.36
     path: /assignment
+- name: US - zhuhai.uk 08
+  type: trojan
+  server: dominant-jaguar.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
 - name: 🇺🇸 美国 | USA 6
-  server: 169.40.42.89
+  server: 169.40.42.35
   port: 443
   type: vless
   uuid: d65cc14c-f53f-4fe2-b262-97856601319c
@@ -864,27 +855,28 @@ proxies:
   client-fingerprint: ios
   network: tcp
   udp: true
-- name: 🇺🇸 美国 | USA 3
-  server: 35-209-199-239.liao.kdns.fr
-  port: 50160
-  type: hysteria2
-  password: b41ad7f941ffce755cb8601bfd0f02ca
-  auth: b41ad7f941ffce755cb8601bfd0f02ca
-  sni: 35-209-199-239.liao.kdns.fr
-  skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 10
-  server: 172.64.146.211
-  port: 2087
-  type: vless
-  uuid: 77777777-8a3e-6666-b6d1-a9c5f0e8b3a2
+- name: US - zhuhai.uk 04
+  type: http
+  server: 138.199.35.204
+  port: 9002
+  username: 'null'
+  password: None
   tls: true
-  servername: faxf32gkfzoxqv.fx6hsv0.ccwu.cc
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: faxf32gkfzoxqv.fx6hsv0.ccwu.cc
+  sni: 138.199.35.204
+  skip-cert-verify: true
+- name: US - zhuhai.uk 05
+  type: http
+  server: 138.199.35.204
+  port: 9002
+  tls: true
+  sni: 138.199.35.204
+  skip-cert-verify: true
+- name: 🇺🇸 美国 | USA 3
+  server: 129.146.73.229
+  port: 50356
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: 6EIW6TpEGUAHz8tihBsiDpDi+HMwEG0ZvHmx80Z9hwE=
   udp: true
 - client-fingerprint: chrome
   name: us|f508|puddincat07@Telegram
@@ -901,161 +893,22 @@ proxies:
       User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.7
         (KHTML, like Gecko) Chrome/7.0.517.44 Safari/534.7
     path: /assignment
-- name: US - zhuhai.uk 04
-  type: http
-  server: 156.146.59.5
-  port: 9002
-  tls: true
-  skip-cert-verify: true
 - name: 🇺🇸 美国 | USA 5
-  server: 200.165.228.114
-  port: 9871
-  type: vless
-  uuid: 2a650f3b-d95b-4bd6-aadf-16ccc0717155
-  tls: true
-  reality-opts:
-    public-key: Dfgu8Ey0M8Hz4gXGZAwQ3H9jLt2HByVsjAOTWiuKDB0
-    short-id: aabb
-  servername: dl.google.com
-  client-fingerprint: qq
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: grpc-tunnel
-  udp: true
-- client-fingerprint: chrome
-  name: us|4896|puddincat07@Telegram
-  network: ws
-  password: humanity
-  port: 443
-  server: 104.16.174.44
-  skip-cert-verify: false
-  sni: www.ignitelimit.com
-  type: trojan
-  udp: true
-  ws-opts:
-    headers:
-      User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML,
-        like Gecko) Chrome/65.0.3325.181 Safari/537.36
-    path: /assignment
-- name: 🇺🇸 美国 | USA
-  server: 179.255.153.122
-  port: 50159
-  type: vless
-  uuid: ae696020-dc40-4056-80ed-31e95910694d
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: _q09H87Xd_05Zw_PjjHe9kL2cM4xIqyspDicdH9QcVA
-    short-id: f2b127cca2827ee7
-  servername: www.cloudflare.com
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
+  server: 129-146-143-124.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: 4fd8857a2c6af64470191e79500f42d7
+  auth: 4fd8857a2c6af64470191e79500f42d7
+  sni: 129-146-143-124.liao.kdns.fr
+  skip-cert-verify: true
 - name: US - zhuhai.uk 06
-  type: http
-  server: 156.146.59.50
-  port: 9002
-  username: 'null'
-  password: None
-  tls: true
-  sni: 156.146.59.50
-  skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 19
-  server: k2.cloud--vpn.site
-  port: 443
-  type: vless
-  uuid: 79c9514e-aa3c-4cd0-bf0d-dd6df42039f6
-  tls: true
-  alpn:
-  - h2
-  servername: ssl.fastly.com
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: c12.com
-  udp: true
-- name: US - zhuhai.uk 02
-  type: vless
-  server: 64.186.231.51
-  port: 45144
-  uuid: 66a9f53a-c80b-428c-baad-80131fc3870f
-  flow: xtls-rprx-vision
-  tls: true
-  servername: ysvoic.com
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: AjPZ5Fc0UN1XyKjU9Y5Gektbs-Umv5OPabK1jhtw2nY
-    short-id: da2bdaad4438cbcb
-- name: 🇺🇸 美国 | USA 15
-  server: 64.64.232.209
-  port: 13779
-  type: vless
-  uuid: 928e6cce-8ced-4243-9a48-a6642edd09b0
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: llTyp52oRXnJmQ3I9UUrmlwbMA79B-wLCRHCu-8dLGg
-    short-id: af1bdd293097b664
-  servername: tesla.com
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: US - zhuhai.uk
-  type: http
-  server: 156.146.59.23
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 156.146.59.23
-  skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 14
-  server: 151.101.56.6
-  port: 443
-  type: vless
-  uuid: 79c9514e-aa3c-4cd0-bf0d-dd6df42039f6
-  tls: true
-  alpn:
-  - h2
-  servername: ssl.fastly.com
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: c12.com
-  udp: true
-- name: US - zhuhai.uk 01
   type: trojan
-  server: comic-poodle.rooster465.autos
+  server: outgoing-lynx.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: 🇺🇸 美国 | USA 23
-  server: 154.17.0.91
-  port: 50159
-  type: vless
-  uuid: 645db8a7-8049-408d-8e61-ae3a67a324a0
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: qGUBbKjlanqEx7El13jH_mBmDWHZ1a-PmxnwETB-9lM
-    short-id: 2bad4cafb9965963
-  servername: www.cloudflare.com
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: US - zhuhai.uk 10
-  type: trojan
-  server: tough-tuna.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: 🇺🇸 美国 | USA 28
-  server: 169.40.42.74
+- name: 🇺🇸 美国 | USA 10
+  server: 169.40.42.229
   port: 443
   type: vless
   uuid: d65cc14c-f53f-4fe2-b262-97856601319c
@@ -1068,28 +921,119 @@ proxies:
   client-fingerprint: ios
   network: tcp
   udp: true
+- name: 🇺🇸 美国 | USA 19
+  server: 51.81.223.225
+  port: 11094
+  type: vless
+  uuid: f1fa0ad9-b122-4b7c-da82-4bea9edc48dd
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: 9dnXiXxP4xgvtTVRj9SBFdyO6mjGvVhWD8qVZZLCCCk
+    short-id: a356addf
+  servername: www.yahoo.com
+  client-fingerprint: chrome
+  network: tcp
+  udp: true
+- name: 🇺🇸 美国 | USA 15
+  server: 107-173-165-41.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: 6f6f58431702c3aa0b55ddf3d0a63a2c
+  auth: 6f6f58431702c3aa0b55ddf3d0a63a2c
+  sni: 107-173-165-41.liao.kdns.fr
+  skip-cert-verify: true
+- name: US - zhuhai.uk 02
+  type: vless
+  server: 51.81.223.225
+  port: 11094
+  uuid: f1fa0ad9-b122-4b7c-da82-4bea9edc48dd
+  flow: xtls-rprx-vision
+  tls: true
+  servername: www.yahoo.com
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: 9dnXiXxP4xgvtTVRj9SBFdyO6mjGvVhWD8qVZZLCCCk
+    short-id: a356addf
+- name: US - zhuhai.uk 01
+  type: trojan
+  server: comic-poodle.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: 🇺🇸 美国 | USA 22
+  server: 35-209-199-239.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: b41ad7f941ffce755cb8601bfd0f02ca
+  auth: b41ad7f941ffce755cb8601bfd0f02ca
+  sni: 35-209-199-239.liao.kdns.fr
+  skip-cert-verify: true
+- client-fingerprint: chrome
+  name: us|b84c|puddincat07@Telegram
+  network: ws
+  password: humanity
+  port: 443
+  server: 104.16.174.6
+  skip-cert-verify: false
+  sni: www.ignitelimit.com
+  type: trojan
+  udp: true
+  ws-opts:
+    headers:
+      User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+        like Gecko) Chrome/70.0.3538.67 Safari/537.36
+    path: /assignment
+- name: US - zhuhai.uk 10
+  type: trojan
+  server: tough-tuna.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: 🇮🇪 爱尔兰 | IRL 5
+  server: cunning-grub.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  sni: cunning-grub.rooster465.autos
+  skip-cert-verify: true
+  udp: true
 - name: RO - zhuhai.uk 05
   type: http
-  server: 84.239.49.41
+  server: 84.239.49.201
   port: 9002
+  username: 'null'
+  password: 'null'
   tls: true
-  sni: 84.239.49.41
   skip-cert-verify: true
-- name: KR - zhuhai.uk 07
+- name: 🇳🇱 荷兰 | NLD 7
+  server: 85.155.226.149
+  port: 443
+  type: vless
+  uuid: 39c42b0a-b823-4c93-bb99-74b4183e518d
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: 5Z6PwoPSNBLPIsX8lZtHM7-Y-psMMR1vz5Pit0EVISs
+    short-id: 82f5d3a1e9c0b661
+  servername: getsavesafe.net
+  client-fingerprint: qq
+  network: tcp
+- name: FR - zhuhai.uk 03
   type: trojan
-  server: kind-grizzly.rooster465.autos
+  server: correct-pony.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
 - name: RO - zhuhai.uk 03
   type: http
-  server: 193.176.84.38
+  server: 84.239.49.217
   port: 9002
   tls: true
   skip-cert-verify: true
-- name: FR - zhuhai.uk 03
+- name: KR - zhuhai.uk 07
   type: trojan
-  server: correct-pony.rooster465.autos
+  server: kind-grizzly.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -1107,30 +1051,33 @@ proxies:
   skip-cert-verify: true
   udp: true
 - name: 🇩🇪 德国 | DEU 2
-  server: 185.109.48.13
-  port: 2053
-  type: vless
-  uuid: c7e9c591-2764-423a-afca-efbd010fd396
-  tls: true
-  servername: forfreeuse.rtqa.ru
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /
-    headers:
-      Host: forfreeuse.rtqa.ru
+  server: 222.167.212.80
+  port: 8443
+  type: hysteria2
+  password: Apt1923_N9x234gn_Nal5Nx3j_s
+  auth: Apt1923_N9x234gn_Nal5Nx3j_s
+  sni: grape-power-pl.ddnsguru.com
+  skip-cert-verify: true
+- name: 🇮🇳 印度 | IND
+  server: 5.180.27.221
+  port: 8080
+  type: hysteria2
+  password: owefv0_92Z540k2F_nx83245_J9130oS_tY
+  auth: owefv0_92Z540k2F_nx83245_J9130oS_tY
+  sni: borat-hopp.bumbleshrimp.com
+  skip-cert-verify: true
+- name: 🇳🇱 荷兰 | NLD 8
+  server: 152.70.53.76
+  port: 45819
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: YyppYr+19SFyy4WAU2OmSlq+NwKjR+L0oV2CCJ6rMAM=
+  udp: true
 - name: AU - zhuhai.uk 01
   type: trojan
   server: true-pony.rooster465.autos
   port: 443
   password: FH72359861
-  udp: true
-- name: 🇬🇧 英国 | GBR 4
-  server: 144.24.229.230
-  port: 61312
-  type: ss
-  cipher: 2022-blake3-chacha20-poly1305
-  password: EOMKHJ7htCaQWlQV7lWfaNS5jnhWg94TbhEMDEby7sE=
   udp: true
 - name: KR - zhuhai.uk 20
   type: trojan
@@ -1138,56 +1085,40 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇷🇺 俄罗斯 | RUS 4
-  server: 104.18.32.47
-  port: 443
-  type: vless
-  uuid: a5a544bf-e4b3-4651-9ff4-de3461910d87
-  tls: true
-  alpn:
-  - h3
-  servername: rus.aba-hum.store
-  client-fingerprint: chrome
-  network: xhttp
-  xhttp-opts:
-    path: /
-    mode: auto
-  udp: true
 - name: KR - zhuhai.uk 05
   type: trojan
   server: good-hound.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: 🇵🇱 波兰 | POL 6
-  server: 144.31.1.28
-  port: 2086
-  type: hysteria2
-  password: 08794874-93d0-4cf2-b9d6-1f2774cdffeb
-  auth: 08794874-93d0-4cf2-b9d6-1f2774cdffeb
-  sni: panel.vlessbotkey.ru
-  skip-cert-verify: true
 - name: 🇰🇷 韩国 | KOR 2
-  server: 221.155.195.197
-  port: 10000
-  type: vless
-  uuid: 83efc3a0-05c6-462b-89f7-07c430f73c03
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: kdlgIBl7R_1DIWtJIrOqYwt65nedPCbz6XoomdpQIXM
-  servername: apple.com
-  client-fingerprint: chrome
-  network: tcp
+  server: one-dove.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  skip-cert-verify: true
   udp: true
 - name: 🇩🇪 德国 | DEU 7
-  server: 89.106.85.19
-  port: 8444
+  server: 194.48.250.9
+  port: 9443
   type: hysteria2
-  password: e8c93f75-4ed5-41b1-a32e-a846e54582e8
-  auth: e8c93f75-4ed5-41b1-a32e-a846e54582e8
-  sni: premium-de-hy2.geodema.network
+  password: b8f1b61e-d5c4-4765-866d-ece1fc8e590b
+  auth: b8f1b61e-d5c4-4765-866d-ece1fc8e590b
+  sni: onecloudstream.com
   skip-cert-verify: true
+- name: DE - zhuhai.uk
+  type: vless
+  server: 78.159.247.253
+  port: 2027
+  uuid: 851ed0d8-a37b-452d-8ef2-5b6c2d28a060
+  flow: xtls-rprx-vision
+  tls: true
+  servername: storage.yandex.net
+  skip-cert-verify: true
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: ISa-DZOI4LRRb9DHMFYm5oFqBXDjYzz0hVWUfWvzLmo
+    short-id: dc8109baf0f607ea
 - client-fingerprint: chrome
   name: xx|8008|puddincat07@Telegram
   network: ws
@@ -1202,28 +1133,73 @@ proxies:
       User-Agent: Mozilla/5.0 (Linux; Android 6.0.1; SM-G532G Build/MMB29T) AppleWebKit/537.36
         (KHTML, like Gecko) Chrome/63.0.3239.83 Mobile Safari/537.36
     path: /assignment
-- name: 🇷🇺 俄罗斯 | RUS 2
-  server: 46.254.18.27
+- name: 🇰🇷 韩国 | KOR 4
+  server: star-bluejay.rooster465.autos
   port: 443
-  type: vless
-  uuid: 52b202f9-493d-4b52-a656-64637f36afa7
-  tls: true
-  servername: cloudflare.vhub.pro
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /websocket?ed=2560
-    headers:
-      Host: cloudflare.vhub.pro
+  type: trojan
+  password: FH72359861
+  skip-cert-verify: true
   udp: true
+- name: 🇷🇺 俄罗斯 | RUS 2
+  server: 185-22-155-81.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: 2a0099ded5baa93c55823af39229c5b1
+  auth: 2a0099ded5baa93c55823af39229c5b1
+  sni: 185-22-155-81.liao.kdns.fr
+  skip-cert-verify: true
 - name: RO - zhuhai.uk 02
   type: http
-  server: 193.176.84.37
+  server: 84.239.49.238
   port: 9002
   tls: true
   sni: www.bing.com
   skip-cert-verify: true
-- name: 🇰🇬 KG_70
+- name: KR - zhuhai.uk 26
+  type: trojan
+  server: firm-krill.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: 🇳🇱 荷兰 | NLD 4
+  server: renewed-chigger.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  skip-cert-verify: true
+  udp: true
+- name: 🇳🇱 荷兰 | NLD
+  server: 144.31.127.203
+  port: 8443
+  type: vless
+  uuid: 6413aa86-6eb4-45a8-87ca-24b0227159b7
+  tls: true
+  reality-opts:
+    public-key: FMa1j8qQTn98uxWeoHiAWQxP_pPD2r7x3bjKjT83-yM
+    short-id: 144f524372a89dcd
+  servername: api.vk.ru
+  client-fingerprint: edge
+  network: xhttp
+  xhttp-opts:
+    path: /api/v1/feed
+    host: api.vk.ru
+    mode: auto
+  udp: true
+- name: KR - zhuhai.uk 21
+  type: trojan
+  server: gentle-platypus.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: 🇰🇷 韩国 | KOR 10
+  server: 152-69-231-175.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: 1beb216e3f60aea9555dae60d219a5ca
+  auth: 1beb216e3f60aea9555dae60d219a5ca
+  sni: 152-69-231-175.liao.kdns.fr
+  skip-cert-verify: true
+- name: 🇰🇬 KG_63
   server: 81.85.75.85
   port: 443
   type: vless
@@ -1237,96 +1213,44 @@ proxies:
   client-fingerprint: firefox
   network: tcp
   udp: true
-- name: KR - zhuhai.uk 26
-  type: trojan
-  server: firm-krill.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: 🇳🇱 荷兰 | NLD
-  server: renewed-chigger.rooster465.autos
-  port: 443
-  type: trojan
-  password: FH72359861
-  skip-cert-verify: true
-  udp: true
-- name: 🇰🇷 韩国 | KOR 10
-  server: balanced-stag.rooster465.autos
-  port: 443
-  type: trojan
-  password: HC04361579
-  sni: balanced-stag.rooster465.autos
-  skip-cert-verify: true
-  udp: true
-- name: 🇷🇺 俄罗斯 | RUS 3
-  server: 45.151.30.127
-  port: 9882
-  type: vless
-  uuid: 2a650f3b-d95b-4bd6-aadf-16ccc0717155
-  tls: true
-  reality-opts:
-    public-key: bnRIb3Er1i-K6NGGByCO9UbGfOvu43ZoiK7ulPd1SzU
-  servername: dl.google.com
-  client-fingerprint: qq
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: grpc-tunnel
-  udp: true
 - name: 🇰🇷 韩国 | KOR 3
-  server: 152-69-231-175.liao.kdns.fr
-  port: 50160
-  type: hysteria2
-  password: 1beb216e3f60aea9555dae60d219a5ca
-  auth: 1beb216e3f60aea9555dae60d219a5ca
-  sni: 152-69-231-175.liao.kdns.fr
+  server: complete-narwhal.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  sni: complete-narwhal.rooster465.autos
   skip-cert-verify: true
+  udp: true
 - name: KR - zhuhai.uk 11
   type: trojan
   server: learning-ladybug.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: 🇰🇷 韩国 | KOR 9
-  server: key-barnacle.rooster465.autos
-  port: 443
-  type: trojan
-  password: HC04361579
-  sni: key-barnacle.rooster465.autos
-  skip-cert-verify: true
-  udp: true
-- name: 🇰🇷 韩国 | KOR 12
-  server: 152.67.200.82
-  port: 50160
-  type: hysteria2
-  password: 3d7634af8cb2c6cb4bac1c0efad8b43d
-  auth: 3d7634af8cb2c6cb4bac1c0efad8b43d
-  sni: 152-67-200-82.liao.kdns.fr
-  skip-cert-verify: true
 - name: FR - zhuhai.uk 05
   type: trojan
   server: smiling-fowl.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
+- name: 🇰🇷 韩国 | KOR 9
+  server: aware-coyote.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  skip-cert-verify: true
+  udp: true
 - name: RO - zhuhai.uk 06
   type: http
-  server: 84.239.49.160
-  port: 9002
-  tls: true
-  skip-cert-verify: true
-- name: RO - zhuhai.uk 09
-  type: http
-  server: 84.239.49.219
+  server: 84.239.49.175
   port: 9002
   tls: true
   sni: www.bing.com
   skip-cert-verify: true
-- name: IE - zhuhai.uk
-  type: trojan
-  server: balanced-heron.rooster465.autos
-  port: 443
-  password: FH72359861
+- name: RO - zhuhai.uk 09
+  type: http
+  server: 84.239.49.248
+  port: 9002
   tls: true
   skip-cert-verify: true
 - name: FR - zhuhai.uk 06
@@ -1336,27 +1260,21 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇹🇼 🇨🇳 台湾 | TWN
-  server: 45.121.50.241
-  port: 50159
-  type: vless
-  uuid: 47a97b7f-044d-43d6-86b0-8b256873d1b5
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: E9gCs_C_mSDcHmlCZSMk1kSXpmua48DhgsT_aDpZ1WE
-    short-id: 4c3f80051030ba1b
-  servername: www.cloudflare.com
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: 🇰🇷 韩国 | KOR 8
-  server: star-bluejay.rooster465.autos
-  port: 443
-  type: trojan
-  password: HC04361579
-  sni: star-bluejay.rooster465.autos
+  server: 85.237.207.49
+  port: 50160
+  type: hysteria2
+  password: a56619e2bed91121eabb97d20be207c3
+  auth: a56619e2bed91121eabb97d20be207c3
+  sni: 85-237-207-49.liao.kdns.fr
   skip-cert-verify: true
-  udp: true
+- name: 🇰🇷 韩国 | KOR 8
+  server: 150-230-252-217.liao.kdns.fr
+  port: 50160
+  type: hysteria2
+  password: 9cfc9458e48c028ec03ff86ebc71c744
+  auth: 9cfc9458e48c028ec03ff86ebc71c744
+  sni: 150-230-252-217.liao.kdns.fr
+  skip-cert-verify: true
 - client-fingerprint: chrome
   name: xx|c122|puddincat07@Telegram
   network: ws
@@ -1373,12 +1291,12 @@ proxies:
         like Gecko) Chrome/63.0.3239.132 Safari/537.36
     path: /assignment
 - name: 🇷🇺 俄罗斯 | RUS
-  server: 185-22-155-81.liao.kdns.fr
-  port: 50160
+  server: els1.mangshe.xyz
+  port: 2056
   type: hysteria2
-  password: 2a0099ded5baa93c55823af39229c5b1
-  auth: 2a0099ded5baa93c55823af39229c5b1
-  sni: 185-22-155-81.liao.kdns.fr
+  password: 22d891f5-ad85-4824-b0b8-e30cf3d37eb5
+  auth: 22d891f5-ad85-4824-b0b8-e30cf3d37eb5
+  sni: els1.mangshe.xyz
   skip-cert-verify: true
 - name: KR - zhuhai.uk 31
   type: trojan
@@ -1387,33 +1305,32 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇩🇪 德国 | DEU 3
-  server: mg2.mangshe.xyz
-  port: 2056
-  type: hysteria2
-  password: 22d891f5-ad85-4824-b0b8-e30cf3d37eb5
-  auth: 22d891f5-ad85-4824-b0b8-e30cf3d37eb5
-  sni: mg2.mangshe.xyz
-  skip-cert-verify: true
-- name: AU - zhuhai.uk 02
-  type: trojan
-  server: national-stingray.rooster465.autos
+  server: 163.5.153.153
   port: 443
-  password: FH72359861
+  type: vless
+  uuid: 0a76a766-d141-44b8-944e-dff757d7116f
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: aB_2Tcf0A5LoiIEZHztR_l-ZOFeJKxYRH67s_OVQ9C0
+    short-id: a91045bc
+  servername: www.samsung.com
+  client-fingerprint: chrome
+  network: tcp
   udp: true
-- name: 🇲🇾 马来西亚 | MYS 2
-  server: 47-250-51-16.liao.kdns.fr
-  port: 50160
-  type: hysteria2
-  password: 94c44047f066661fa4175c9823e56394
-  auth: 94c44047f066661fa4175c9823e56394
-  sni: 47-250-51-16.liao.kdns.fr
-  skip-cert-verify: true
 - name: 🇰🇷 韩国 | KOR 5
-  server: gentle-platypus.rooster465.autos
+  server: key-barnacle.rooster465.autos
+  port: 443
+  type: trojan
+  password: HC04361579
+  sni: key-barnacle.rooster465.autos
+  skip-cert-verify: true
+  udp: true
+- name: 🇮🇪 爱尔兰 | IRL 6
+  server: summary-firefly.rooster465.autos
   port: 443
   type: trojan
   password: FH72359861
-  sni: gentle-platypus.rooster465.autos
   skip-cert-verify: true
   udp: true
 - name: KR - zhuhai.uk 06
@@ -1422,29 +1339,11 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇰🇷 韩国 | KOR 11
-  server: precise-locust.rooster465.autos
+- name: 🇮🇪 爱尔兰 | IRL 2
+  server: balanced-heron.rooster465.autos
   port: 443
   type: trojan
   password: FH72359861
-  sni: precise-locust.rooster465.autos
-  skip-cert-verify: true
-  udp: true
-- name: 🇰🇷 韩国 | KOR 15
-  server: complete-narwhal.rooster465.autos
-  port: 443
-  type: trojan
-  password: FH72359861
-  sni: complete-narwhal.rooster465.autos
-  skip-cert-verify: true
-  udp: true
-- name: 🇩🇪 德国 | DEU 5
-  server: 162.249.124.103
-  port: 8443
-  type: hysteria2
-  password: 9Me_Jx935gnHx13_Nx45M_NYXe037js_Be4z
-  auth: 9Me_Jx935gnHx13_Nx45M_NYXe037js_Be4z
-  sni: mercedes-grape.yyuyy.com
   skip-cert-verify: true
 - name: 🇩🇰 丹麦 | DNK
   server: dk86.mechvpn.online
@@ -1456,16 +1355,35 @@ proxies:
   skip-cert-verify: true
   alpn:
   - h3
+- name: 🇩🇪 德国 | DEU 5
+  server: 78.159.247.253
+  port: 2027
+  type: vless
+  uuid: 851ed0d8-a37b-452d-8ef2-5b6c2d28a060
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: ISa-DZOI4LRRb9DHMFYm5oFqBXDjYzz0hVWUfWvzLmo
+    short-id: dc8109baf0f607ea
+  servername: storage.yandex.net
+  client-fingerprint: chrome
+  network: tcp
+  udp: true
+- name: KR - zhuhai.uk 29
+  type: trojan
+  server: balanced-stag.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
 - name: RO - zhuhai.uk 04
   type: http
-  server: 193.176.84.23
+  server: 84.239.49.59
   port: 9002
   tls: true
-  sni: www.bing.com
   skip-cert-verify: true
-- name: KR - zhuhai.uk 32
+- name: AU - zhuhai.uk 03
   type: trojan
-  server: upright-rhino.rooster465.autos
+  server: square-pheasant.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -1475,33 +1393,35 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: NL - zhuhai.uk
-  type: vless
-  server: rm-nl-01.409648.xyz
-  port: 20725
-  uuid: 6dcb725e-947e-4bbe-bb35-903374d57179
-  flow: xtls-rprx-vision
-  tls: true
-  servername: d1--ov-gotcha07.bilivideo.com
-  client-fingerprint: qq
-  reality-opts:
-    public-key: hceZHd9X9FSbWGXGgm3OWN-4Au26rrsriTcyHw5M3VU
-    short-id: 0102ac4e
-- name: 🇦🇺 澳大利亚 | AUS
-  server: square-pheasant.rooster465.autos
-  port: 443
+- name: KR - zhuhai.uk 32
   type: trojan
+  server: upright-rhino.rooster465.autos
+  port: 443
   password: FH72359861
-  skip-cert-verify: true
   udp: true
+- name: 🇨🇳 CN_01
+  server: 139.28.168.55
+  port: 9080
+  type: hysteria2
+  password: 0wdsa_nJXEWRj9jz9J9xMgtx_n7gzfK_m8
+  auth: 0wdsa_nJXEWRj9jz9J9xMgtx_n7gzfK_m8
+  sni: grape-honk.yyuyy.com
+  skip-cert-verify: true
 - name: 🇮🇪 爱尔兰 | IRL
-  server: touching-turtle.rooster465.autos
+  server: 54.216.139.140
   port: 443
   type: trojan
   password: FH72359861
-  sni: touching-turtle.rooster465.autos
+  sni: cunning-grub.rooster465.autos
   skip-cert-verify: true
   udp: true
+- name: 🇦🇺 澳大利亚 | AUS
+  server: national-stingray.rooster465.autos
+  port: 443
+  type: trojan
+  password: FH72359861
+  sni: national-stingray.rooster465.autos
+  skip-cert-verify: true
 - name: DE - zhuhai.uk 01
   type: trojan
   server: epic-iguana.rooster465.autos
@@ -1526,65 +1446,60 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: KR - zhuhai.uk 04
-  type: trojan
-  server: star-bluejay.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
-- name: 🇵🇦 PA_22
-  server: 82.38.60.122
-  port: 8080
-  type: hysteria2
-  password: VB92_Ka9qwef143K_L23K1hz3_bF_Hz62uT_Bn1_sC
-  auth: VB92_Ka9qwef143K_L23K1hz3_bF_Hz62uT_Bn1_sC
-  sni: hopp-us.yyuyy.com
-  skip-cert-verify: true
 - name: 🇵🇱 波兰 | POL
-  server: 144.31.5.9
-  port: 2101
-  type: hysteria2
-  password: 08794874-93d0-4cf2-b9d6-1f2774cdffeb
-  auth: 08794874-93d0-4cf2-b9d6-1f2774cdffeb
-  sni: panel.vlessbotkey.ru
-  skip-cert-verify: true
-- name: 🇧🇷 巴西 | BRA 2
-  server: 136.248.80.6
-  port: 59319
-  type: ss
-  cipher: 2022-blake3-chacha20-poly1305
-  password: aT6rqN4f04fLRZCT7Dti1VhCvSaxC6C85CUsXPoJqeo=
+  server: 94.183.157.121
+  port: 443
+  type: vless
+  uuid: 423b1d79-08c4-403f-9d5e-c541f791b55f
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: b-Cm9hX-3UHsS1L_lnUB6AMjuKhlN1IDdBbZ506itjI
+    short-id: 00bca5982f82d083
+  servername: eu-central.cendora.ru
+  client-fingerprint: qq
+  network: tcp
   udp: true
-- name: 🇦🇺 澳大利亚 | AUS 2
-  server: 159.13.40.41
-  port: 20000
-  type: hysteria2
-  password: b42d90fa667942aebc734d60
-  auth: b42d90fa667942aebc734d60
-  sni: rmgyvpn.rest
+- name: RO - zhuhai.uk 11
+  type: http
+  server: 84.239.49.251
+  port: 9002
+  tls: true
+  sni: www.bing.com
   skip-cert-verify: true
-  obfs: salamander
-  obfs-password: b42d90fa667942aebc734d60
+- name: nl|7363|puddincat07@Telegram
+  password: gf1:gfhysteria2024
+  port: 443
+  server: 5.129.235.85
+  skip-cert-verify: true
+  sni: www.linux.com
+  type: hysteria2
+  udp: true
 - name: 🇩🇪 德国 | DEU 8
-  server: 194.48.250.9
-  port: 9443
-  type: hysteria2
-  password: b8f1b61e-d5c4-4765-866d-ece1fc8e590b
-  auth: b8f1b61e-d5c4-4765-866d-ece1fc8e590b
-  sni: onecloudstream.com
-  skip-cert-verify: true
+  server: 31.133.0.240
+  port: 2053
+  type: vless
+  uuid: c7e9c591-2764-423a-afca-efbd010fd396
+  tls: true
+  servername: forfreeuse.rtqa.ru
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /
+    headers:
+      Host: forfreeuse.rtqa.ru
+  udp: true
 - name: KR - zhuhai.uk 25
   type: trojan
   server: square-skink.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
-- name: 🇵🇭 菲律宾 | PHL
-  server: 149.104.109.252
-  port: 8882
-  type: ss
-  cipher: aes-256-gcm
-  password: kDWvXYZoTBcGkC4
+- name: KR - zhuhai.uk 09
+  type: trojan
+  server: precise-locust.rooster465.autos
+  port: 443
+  password: FH72359861
   udp: true
 - name: KR - zhuhai.uk 10
   type: trojan
@@ -1612,18 +1527,13 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: KR - zhuhai.uk 28
-  type: trojan
-  server: fit-marten.rooster465.autos
-  port: 443
-  password: FH72359861
+- name: 🇧🇷 巴西 | BRA
+  server: 163.176.56.46
+  port: 59319
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: 2f/hSnAF5GDhyve8brmwep/LzS1dKM8uaWRYsvIobFw=
   udp: true
-- name: RO - zhuhai.uk
-  type: http
-  server: 84.239.49.245
-  port: 9002
-  tls: true
-  skip-cert-verify: true
 - alpn:
   - h3
   congestion-controller: bbr
@@ -1638,12 +1548,18 @@ proxies:
   udp: true
   udp-relay-mode: native
   uuid: 3ebac90b-6977-47c0-bef5-b2e37554432c
-- name: KR - zhuhai.uk
+- name: KR - zhuhai.uk 28
   type: trojan
-  server: aware-coyote.rooster465.autos
+  server: fit-marten.rooster465.autos
   port: 443
   password: FH72359861
+  udp: true
+- name: RO - zhuhai.uk
+  type: http
+  server: 84.239.49.225
+  port: 9002
   tls: true
+  sni: 84.239.49.225
   skip-cert-verify: true
 - name: IM - zhuhai.uk
   type: socks5
@@ -1651,13 +1567,33 @@ proxies:
   port: 1080
   username: N9cyF6jvgy3ZEmCNKe04zBIR
   password: 1Telegram_MojiVPN
-- name: 🇬🇧 英国 | GBR 2
-  server: 134.65.62.195
-  port: 61312
-  type: ss
-  cipher: 2022-blake3-chacha20-poly1305
-  password: 5CkaY/EgA106Ec/ceWI2A4I7BXIgbDUJ6hRnDiCWX60=
+- name: 🇩🇪 德国 | DEU 4
+  server: 212.100.171.149
+  port: 5025
+  type: vless
+  uuid: 1c2b69b0-c777-40fc-8a29-f87c28a451cd
+  tls: false
+  network: tcp
   udp: true
+- name: KR - zhuhai.uk
+  type: trojan
+  server: star-bluejay.rooster465.autos
+  port: 443
+  password: HC04361579
+  tls: true
+  sni: star-bluejay.rooster465.autos
+- name: BG - zhuhai.uk
+  type: vless
+  server: 195.123.226.114
+  port: 443
+  uuid: 423b1d79-08c4-403f-9d5e-c541f791b55f
+  flow: xtls-rprx-vision
+  tls: true
+  servername: eu-central.cendora.ru
+  client-fingerprint: firefox
+  reality-opts:
+    public-key: b-Cm9hX-3UHsS1L_lnUB6AMjuKhlN1IDdBbZ506itjI
+    short-id: 00bca5982f82d083
 - name: KR - zhuhai.uk 27
   type: trojan
   server: elegant-horse.rooster465.autos
@@ -1670,26 +1606,21 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇳🇱 荷兰 | NLD 6
+  server: 144.31.135.204
+  port: 1935
+  type: hysteria2
+  password: hysteria2_fastlane_9r63hua9f:KR0ayzwokB6pZySqiZ15Erm6cQHR7C4E
+  auth: hysteria2_fastlane_9r63hua9f:KR0ayzwokB6pZySqiZ15Erm6cQHR7C4E
+  sni: nl2.h.fastlanehosting.ru
+  skip-cert-verify: true
 - name: 🇰🇷 韩国 | KOR
-  server: 43.202.61.210
+  server: star-shrimp.rooster465.autos
   port: 443
   type: trojan
-  password: FH72359861
-  sni: loyal-molly.rooster465.autos
+  password: HC04361579
+  sni: star-shrimp.rooster465.autos
   skip-cert-verify: true
-- name: 🇵🇱 波兰 | POL 4
-  server: 94.183.157.121
-  port: 443
-  type: vless
-  uuid: 423b1d79-08c4-403f-9d5e-c541f791b55f
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: b-Cm9hX-3UHsS1L_lnUB6AMjuKhlN1IDdBbZ506itjI
-    short-id: 00bca5982f82d083
-  servername: eu-central.cendora.ru
-  client-fingerprint: qq
-  network: tcp
   udp: true
 - name: DE - zhuhai.uk 05
   type: trojan
@@ -1704,15 +1635,14 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇳🇱 荷兰 | NLD 2
-  server: 158.178.153.121
-  port: 62145
-  type: vless
-  uuid: 8fb65472-5957-4f64-ba2d-b5812b2f155a
-  tls: false
-  network: tcp
+  server: 141.148.234.216
+  port: 45819
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: ChsbgW3Or5iKoWxNZQyTSxGx3KIKHjOD+w1t9/MbeeA=
   udp: true
 - name: 🇨🇴 哥伦比亚 | COL
-  server: 157.137.213.155
+  server: 157.137.236.210
   port: 62145
   type: vless
   uuid: 8fb65472-5957-4f64-ba2d-b5812b2f155a
@@ -1727,20 +1657,19 @@ proxies:
   flow: xtls-rprx-vision
   tls: true
   servername: www.samsung.com
-  skip-cert-verify: true
   client-fingerprint: chrome
   reality-opts:
     public-key: aB_2Tcf0A5LoiIEZHztR_l-ZOFeJKxYRH67s_OVQ9C0
     short-id: a91045bc
-- name: KR - zhuhai.uk 12
-  type: trojan
-  server: daring-sunbeam.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: DE - zhuhai.uk 03
   type: trojan
   server: renewed-porpoise.rooster465.autos
+  port: 443
+  password: FH72359861
+  udp: true
+- name: KR - zhuhai.uk 12
+  type: trojan
+  server: daring-sunbeam.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
@@ -1750,27 +1679,13 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇰🇷 韩国 | KOR 13
-  server: balanced-stag.rooster465.autos
-  port: 443
-  type: trojan
-  password: FH72359861
-  sni: balanced-stag.rooster465.autos
-  skip-cert-verify: true
-  udp: true
 - name: RO - zhuhai.uk 07
   type: http
-  server: 84.239.49.175
+  server: 84.239.49.60
   port: 9002
   tls: true
   sni: www.bing.com
   skip-cert-verify: true
-- name: KR - zhuhai.uk 18
-  type: trojan
-  server: destined-skylark.rooster465.autos
-  port: 443
-  password: FH72359861
-  udp: true
 - name: DE - zhuhai.uk 06
   type: trojan
   server: up-dinosaur.rooster465.autos
@@ -1783,57 +1698,52 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- type: vless
-  name: 未知VLESS-641|free-nodes
-  server: www.true.th
+- name: KR - zhuhai.uk 18
+  type: trojan
+  server: destined-skylark.rooster465.autos
   port: 443
-  uuid: 7ce54bb3-d612-4aa7-be08-089d3c461d53
-  skip-cert-verify: true
+  password: FH72359861
   udp: true
-  tls: true
-  network: ws
-  servername: d1yxsk0zprgivr.cloudfront.net
-  ws-opts:
-    path: /
-    headers:
-      host: d1yxsk0zprgivr.cloudfront.net
-- name: 🇱🇻 拉脱维亚 | LVA
-  server: 104.165.205.225
-  port: 8443
-  type: hysteria2
-  password: b8f1b61e-d5c4-4765-866d-ece1fc8e590b
-  auth: b8f1b61e-d5c4-4765-866d-ece1fc8e590b
-  sni: speedtestmark.com
-  skip-cert-verify: true
+- name: 🇨🇴 哥伦比亚 | COL 2
+  server: 149.130.190.130
+  port: 62145
+  type: vless
+  uuid: 8fb65472-5957-4f64-ba2d-b5812b2f155a
+  tls: false
+  network: tcp
+  udp: true
 - name: KR - zhuhai.uk 08
   type: trojan
   server: possible-yeti.rooster465.autos
   port: 443
   password: FH72359861
   udp: true
+- name: 🇳🇱 荷兰 | NLD 3
+  server: 85.155.226.31
+  port: 443
+  type: vless
+  uuid: 39c42b0a-b823-4c93-bb99-74b4183e518d
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: 5Z6PwoPSNBLPIsX8lZtHM7-Y-psMMR1vz5Pit0EVISs
+    short-id: 82f5d3a1e9c0b661
+  servername: getsavesafe.net
+  client-fingerprint: qq
+  network: tcp
+  udp: true
+- name: 🇮🇪 爱尔兰 | IRL 3
+  server: 3.253.78.205
+  port: 443
+  type: trojan
+  password: FH72359861
+  sni: balanced-heron.rooster465.autos
+  skip-cert-verify: true
 - name: FR - zhuhai.uk 01
   type: trojan
   server: nearby-cod.rooster465.autos
   port: 443
   password: FH72359861
-  udp: true
-- name: 🇫🇷 法国 | FRA 2
-  server: 145.223.68.48
-  port: 443
-  type: vless
-  uuid: dc495bf5-9591-43aa-83de-d8dc7a8769b8
-  tls: false
-  network: ws
-  ws-opts:
-    path: /vless
-  udp: true
-- name: 🇮🇪 爱尔兰 | IRL 3
-  server: cunning-grub.rooster465.autos
-  port: 443
-  type: trojan
-  password: FH72359861
-  sni: cunning-grub.rooster465.autos
-  skip-cert-verify: true
   udp: true
 - name: KR - zhuhai.uk 22
   type: trojan
@@ -1847,61 +1757,39 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
-- name: 🇵🇱 波兰 | POL 5
-  server: 54.36.174.140
-  port: 443
-  type: ss
-  cipher: chacha20-ietf-poly1305
-  password: ytw2awn
-  udp: true
-- name: 🇧🇷 巴西 | BRA 3
-  server: 163.176.56.46
-  port: 59319
-  type: ss
-  cipher: 2022-blake3-chacha20-poly1305
-  password: 2f/hSnAF5GDhyve8brmwep/LzS1dKM8uaWRYsvIobFw=
-  udp: true
-- name: 🇬🇧 英国 | GBR
-  server: 91.193.58.250
-  port: 2096
-  type: vless
-  uuid: 6e59d5c5-7aa3-4c36-a4c4-e3b899525ed2
-  tls: true
-  servername: free-server.techsonic.dev
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /free-server.techsonic.dev
-    headers:
-      Host: free-server.techsonic.dev
-  udp: true
-- name: 🇵🇱 波兰 | POL 3
-  server: 95.85.254.114
+- name: 🇳🇱 荷兰 | NLD 9
+  server: 85.155.226.87
   port: 443
   type: vless
-  uuid: 2cb6b4d9-0c74-45e2-a4fb-645bb8ac532a
+  uuid: 39c42b0a-b823-4c93-bb99-74b4183e518d
   tls: true
   flow: xtls-rprx-vision
   reality-opts:
-    public-key: V2JprbR_aJkS7uX6anyU3nrswGxdvDQT2HpY4WnzuC8
-    short-id: 5629431325884ff0
-  servername: pol4.o4ka-internet.com
-  client-fingerprint: firefox
+    public-key: 5Z6PwoPSNBLPIsX8lZtHM7-Y-psMMR1vz5Pit0EVISs
+    short-id: 82f5d3a1e9c0b661
+  servername: getsavesafe.net
+  client-fingerprint: qq
   network: tcp
   udp: true
-- name: 🇰🇷 韩国 | KOR 14
-  server: 193.122.104.200
-  port: 50160
-  type: hysteria2
-  password: dfb54e674104158210fdfcac45e5679d
-  auth: dfb54e674104158210fdfcac45e5679d
-  sni: 193-122-104-200.liao.kdns.fr
-  skip-cert-verify: true
-- name: KR - zhuhai.uk 30
-  type: trojan
-  server: one-dove.rooster465.autos
+- name: 🇹🇷 土耳其 | TUR 2
+  server: sb1.artinnet.shop
   port: 443
-  password: FH72359861
+  type: vless
+  uuid: bef7acd0-8b81-431d-bcce-a76c3da658ae
+  tls: true
+  reality-opts:
+    public-key: xyMx8lBZ6dn2EO6G3Alt_7bQueu_eZgQ4kZEbMFXL3E
+    short-id: ce
+  servername: w.wiki
+  client-fingerprint: chrome
+  network: tcp
+  udp: true
+- name: 🇬🇧 英国 | GBR
+  server: 144.24.229.230
+  port: 61312
+  type: ss
+  cipher: 2022-blake3-chacha20-poly1305
+  password: EOMKHJ7htCaQWlQV7lWfaNS5jnhWg94TbhEMDEby7sE=
   udp: true
 - name: KR - zhuhai.uk 02
   type: trojan
@@ -1911,14 +1799,7 @@ proxies:
   udp: true
 - name: RO - zhuhai.uk 10
   type: http
-  server: 84.239.49.238
-  port: 9002
-  tls: true
-  sni: www.bing.com
-  skip-cert-verify: true
-- name: RO - zhuhai.uk 08
-  type: http
-  server: 84.239.49.222
+  server: 84.239.49.179
   port: 9002
   tls: true
   skip-cert-verify: true
@@ -1928,6 +1809,14 @@ proxies:
   port: 443
   password: FH72359861
   udp: true
+- name: 🇳🇱 荷兰 | NLD 5
+  server: 191.44.90.4
+  port: 8444
+  type: hysteria2
+  password: e8c93f75-4ed5-41b1-a32e-a846e54582e8
+  auth: e8c93f75-4ed5-41b1-a32e-a846e54582e8
+  sni: premium-nl.geodema.network
+  skip-cert-verify: true
 - name: DE - zhuhai.uk 02
   type: trojan
   server: summary-lemming.rooster465.autos
@@ -1935,18 +1824,32 @@ proxies:
   password: FH72359861
   udp: true
 - name: 🇰🇷 韩国 | KOR 7
-  server: peaceful-muskrat.rooster465.autos
+  server: 43.202.61.210
   port: 443
   type: trojan
-  password: HC04361579
-  sni: peaceful-muskrat.rooster465.autos
+  password: FH72359861
+  sni: loyal-molly.rooster465.autos
   skip-cert-verify: true
+- name: 🇪🇸 西班牙 | ESP
+  server: 185.18.250.252
+  port: 443
+  type: trojan
+  password: humanity
+  sni: www.calmlunch.com
+  skip-cert-verify: true
+  network: ws
+  ws-opts:
+    path: /assignment
+    headers:
+      Host: www.calmlunch.com
   udp: true
 proxy-groups:
 - name: AUTO-FAST
   type: url-test
   proxies:
+  - JP - zhuhai.uk 37
   - JP - zhuhai.uk 72
+  - JP - zhuhai.uk 44
   - SG - zhuhai.uk 37
   - SG - zhuhai.uk 17
   - JP - zhuhai.uk 03
@@ -1956,28 +1859,27 @@ proxy-groups:
   - SG - zhuhai.uk 22
   - 🇭🇰 香港 | HKG 6
   - 🇭🇰 香港 | HKG 7
-  - 🇯🇵 日本 | JPN 5
   - JP - zhuhai.uk 26
+  - 🇯🇵 日本 | JPN 5
   - 🇭🇰 香港 | HKG 2
   - HK - zhuhai.uk 06
   - JP - zhuhai.uk 12
   - JP - zhuhai.uk 63
   - JP - zhuhai.uk 07
   - JP - zhuhai.uk 54
-  - HK - zhuhai.uk 05
   - SG - zhuhai.uk 23
   - 🇭🇰 香港 | HKG 4
-  - JP - zhuhai.uk 15
+  - 🇯🇵 日本 | JPN 12
+  - HK - zhuhai.uk 07
   - JP - zhuhai.uk 01
   - JP - zhuhai.uk 28
-  - HK - zhuhai.uk 07
   - JP - zhuhai.uk 41
-  - JP - zhuhai.uk 19
   - JP - zhuhai.uk 23
-  - JP - zhuhai.uk 71
   - JP - zhuhai.uk 20
   - JP - zhuhai.uk 67
   - JP - zhuhai.uk 39
+  - 🇯🇵 日本 | JPN 11
+  - 🇯🇵 日本 | JPN 10
   - JP - zhuhai.uk 18
   - JP - zhuhai.uk 21
   - SG - zhuhai.uk 25
@@ -1986,12 +1888,11 @@ proxy-groups:
   - JP - zhuhai.uk 13
   - JP - zhuhai.uk 29
   - JP - zhuhai.uk 38
-  - JP - zhuhai.uk 22
+  - JP - zhuhai.uk 02
   - 🇯🇵 日本 | JPN 8
-  - 🇯🇵 日本 | JPN 9
+  - JP - zhuhai.uk 22
   - SG - zhuhai.uk 36
   - 🇯🇵 日本 | JPN 2
-  - 🇯🇵 日本 | JPN 7
   - 🇯🇵 日本 | JPN 6
   - 🇯🇵 日本 | JPN 3
   - JP - zhuhai.uk 74
@@ -2001,28 +1902,27 @@ proxy-groups:
   - SG - zhuhai.uk 24
   - JP - zhuhai.uk 10
   - JP - zhuhai.uk 42
+  - 🇭🇰 香港 | HKG 5
   - JP - zhuhai.uk 27
   - JP - zhuhai.uk 43
+  - 🇭🇰 香港 | HKG 10
+  - SG - zhuhai.uk
   - JP - zhuhai.uk 36
   - JP - zhuhai.uk 30
-  - 🇸🇬 新加坡 | SGP 3
   - JP - zhuhai.uk 33
-  - JP - zhuhai.uk 60
   - 🇯🇵 日本 | JPN 4
   - SG - zhuhai.uk 19
   - JP - zhuhai.uk 08
-  - 🇸🇬 新加坡 | SGP
   - JP - zhuhai.uk 55
   - JP - zhuhai.uk 68
   - JP - zhuhai.uk 11
   - JP - zhuhai.uk 47
-  - 🇸🇬 新加坡 | SGP 6
   - 🇭🇰 香港 | HKG
   - JP - zhuhai.uk 45
   - JP - zhuhai.uk 35
   - JP - zhuhai.uk 66
+  - SG - zhuhai.uk 11
   - JP - zhuhai.uk 31
-  - JP - zhuhai.uk 25
   - JP - zhuhai.uk 69
   - SG - zhuhai.uk 31
   - JP - zhuhai.uk 53
@@ -2031,88 +1931,87 @@ proxy-groups:
   - 🇸🇬 新加坡 | SGP 2
   - JP - zhuhai.uk 04
   - JP - zhuhai.uk 50
+  - 🇭🇰 香港 | HKG 11
   - JP - zhuhai.uk 52
   - 🇯🇵 日本 | JPN
   - JP - zhuhai.uk 56
   - JP - zhuhai.uk 75
   - JP - zhuhai.uk 46
-  - JP - zhuhai.uk 40
   - JP - zhuhai.uk 64
+  - JP - zhuhai.uk 40
   - JP - zhuhai.uk 14
-  - 🇸🇬 新加坡 | SGP 4
-  - JP - zhuhai.uk 73
   - SG - zhuhai.uk 40
+  - JP - zhuhai.uk 73
   - JP - zhuhai.uk 34
+  - 🇭🇰 香港 | HKG 8
   - JP - zhuhai.uk 58
-  - JP - zhuhai.uk 48
   - JP - zhuhai.uk 49
   - HK - zhuhai.uk 01
-  - JP - zhuhai.uk 24
   - JP - zhuhai.uk 06
+  - JP - zhuhai.uk 24
   - JP - zhuhai.uk 70
   - JP - zhuhai.uk 05
   - SG - zhuhai.uk 13
   - JP - zhuhai.uk 16
+  - us|b3d2|puddincat07@Telegram
   - US - zhuhai.uk 09
-  - 🇺🇸 美国 | USA 11
+  - US - zhuhai.uk 07
   - us|b395|puddincat07@Telegram
-  - us|9165|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 26
   - 🇺🇸 美国 | USA 20
-  - 🇺🇸 美国 | USA 25
-  - US - zhuhai.uk 08
-  - 🇺🇸 美国 | USA 16
-  - us|2a14|puddincat07@Telegram
+  - 🇺🇸 美国 | USA 9
+  - 🇺🇸 美国 | USA 8
+  - 🇺🇸 美国 | USA 24
+  - us|9f71|puddincat07@Telegram
   - us|cc28|puddincat07@Telegram
+  - US - zhuhai.uk 08
   - 🇺🇸 美国 | USA 6
-  - 🇺🇸 美国 | USA 3
-  - 🇺🇸 美国 | USA 10
-  - us|f508|puddincat07@Telegram
   - US - zhuhai.uk 04
+  - US - zhuhai.uk 05
+  - 🇺🇸 美国 | USA 3
+  - us|f508|puddincat07@Telegram
   - 🇺🇸 美国 | USA 5
-  - us|4896|puddincat07@Telegram
-  - 🇺🇸 美国 | USA
   - US - zhuhai.uk 06
+  - 🇺🇸 美国 | USA 10
   - 🇺🇸 美国 | USA 19
-  - US - zhuhai.uk 02
   - 🇺🇸 美国 | USA 15
-  - US - zhuhai.uk
-  - 🇺🇸 美国 | USA 14
+  - US - zhuhai.uk 02
   - US - zhuhai.uk 01
-  - 🇺🇸 美国 | USA 23
+  - 🇺🇸 美国 | USA 22
+  - us|b84c|puddincat07@Telegram
   - US - zhuhai.uk 10
-  - 🇺🇸 美国 | USA 28
+  - 🇮🇪 爱尔兰 | IRL 5
   - RO - zhuhai.uk 05
-  - KR - zhuhai.uk 07
-  - RO - zhuhai.uk 03
+  - 🇳🇱 荷兰 | NLD 7
   - FR - zhuhai.uk 03
+  - RO - zhuhai.uk 03
+  - KR - zhuhai.uk 07
   - KR - zhuhai.uk 17
   - 🇰🇷 韩国 | KOR 6
   - 🇩🇪 德国 | DEU 2
+  - 🇮🇳 印度 | IND
+  - 🇳🇱 荷兰 | NLD 8
   - AU - zhuhai.uk 01
-  - 🇬🇧 英国 | GBR 4
   - KR - zhuhai.uk 20
-  - 🇷🇺 俄罗斯 | RUS 4
   - KR - zhuhai.uk 05
-  - 🇵🇱 波兰 | POL 6
   - 🇰🇷 韩国 | KOR 2
   - 🇩🇪 德国 | DEU 7
+  - DE - zhuhai.uk
   - xx|8008|puddincat07@Telegram
+  - 🇰🇷 韩国 | KOR 4
   - 🇷🇺 俄罗斯 | RUS 2
   - RO - zhuhai.uk 02
-  - 🇰🇬 KG_70
   - KR - zhuhai.uk 26
+  - 🇳🇱 荷兰 | NLD 4
   - 🇳🇱 荷兰 | NLD
+  - KR - zhuhai.uk 21
   - 🇰🇷 韩国 | KOR 10
-  - 🇷🇺 俄罗斯 | RUS 3
+  - 🇰🇬 KG_63
   - 🇰🇷 韩国 | KOR 3
   - KR - zhuhai.uk 11
-  - 🇰🇷 韩国 | KOR 9
-  - 🇰🇷 韩国 | KOR 12
   - FR - zhuhai.uk 05
+  - 🇰🇷 韩国 | KOR 9
   - RO - zhuhai.uk 06
   - RO - zhuhai.uk 09
-  - IE - zhuhai.uk
   - FR - zhuhai.uk 06
   - 🇹🇼 🇨🇳 台湾 | TWN
   - 🇰🇷 韩国 | KOR 8
@@ -2120,78 +2019,74 @@ proxy-groups:
   - 🇷🇺 俄罗斯 | RUS
   - KR - zhuhai.uk 31
   - 🇩🇪 德国 | DEU 3
-  - AU - zhuhai.uk 02
-  - 🇲🇾 马来西亚 | MYS 2
   - 🇰🇷 韩国 | KOR 5
+  - 🇮🇪 爱尔兰 | IRL 6
   - KR - zhuhai.uk 06
-  - 🇰🇷 韩国 | KOR 11
-  - 🇰🇷 韩国 | KOR 15
-  - 🇩🇪 德国 | DEU 5
+  - 🇮🇪 爱尔兰 | IRL 2
   - 🇩🇰 丹麦 | DNK
+  - 🇩🇪 德国 | DEU 5
+  - KR - zhuhai.uk 29
   - RO - zhuhai.uk 04
-  - KR - zhuhai.uk 32
+  - AU - zhuhai.uk 03
   - NL - zhuhai.uk 03
-  - NL - zhuhai.uk
-  - 🇦🇺 澳大利亚 | AUS
+  - KR - zhuhai.uk 32
+  - 🇨🇳 CN_01
   - 🇮🇪 爱尔兰 | IRL
+  - 🇦🇺 澳大利亚 | AUS
   - DE - zhuhai.uk 01
   - FR - zhuhai.uk 02
   - NL - zhuhai.uk 02
   - NL - zhuhai.uk 01
-  - KR - zhuhai.uk 04
-  - 🇵🇦 PA_22
   - 🇵🇱 波兰 | POL
-  - 🇧🇷 巴西 | BRA 2
-  - 🇦🇺 澳大利亚 | AUS 2
+  - RO - zhuhai.uk 11
+  - nl|7363|puddincat07@Telegram
   - 🇩🇪 德国 | DEU 8
   - KR - zhuhai.uk 25
-  - 🇵🇭 菲律宾 | PHL
+  - KR - zhuhai.uk 09
   - KR - zhuhai.uk 10
   - 🇵🇱 波兰 | POL 2
   - KR - zhuhai.uk 13
+  - 🇧🇷 巴西 | BRA
+  - de|8097|puddincat07@Telegram
   - KR - zhuhai.uk 28
   - RO - zhuhai.uk
-  - de|8097|puddincat07@Telegram
-  - KR - zhuhai.uk
   - IM - zhuhai.uk
-  - 🇬🇧 英国 | GBR 2
+  - 🇩🇪 德国 | DEU 4
+  - KR - zhuhai.uk
+  - BG - zhuhai.uk
   - KR - zhuhai.uk 27
   - KR - zhuhai.uk 16
+  - 🇳🇱 荷兰 | NLD 6
   - 🇰🇷 韩国 | KOR
-  - 🇵🇱 波兰 | POL 4
   - DE - zhuhai.uk 05
   - KR - zhuhai.uk 19
   - 🇳🇱 荷兰 | NLD 2
   - 🇨🇴 哥伦比亚 | COL
   - FI - zhuhai.uk
-  - KR - zhuhai.uk 12
   - DE - zhuhai.uk 03
+  - KR - zhuhai.uk 12
   - AU - zhuhai.uk 04
-  - 🇰🇷 韩国 | KOR 13
   - RO - zhuhai.uk 07
-  - KR - zhuhai.uk 18
   - DE - zhuhai.uk 06
   - DE - zhuhai.uk 04
-  - 未知VLESS-641|free-nodes
-  - 🇱🇻 拉脱维亚 | LVA
+  - KR - zhuhai.uk 18
+  - 🇨🇴 哥伦比亚 | COL 2
   - KR - zhuhai.uk 08
-  - FR - zhuhai.uk 01
-  - 🇫🇷 法国 | FRA 2
+  - 🇳🇱 荷兰 | NLD 3
   - 🇮🇪 爱尔兰 | IRL 3
+  - FR - zhuhai.uk 01
   - KR - zhuhai.uk 22
   - KR - zhuhai.uk 14
-  - 🇵🇱 波兰 | POL 5
-  - 🇧🇷 巴西 | BRA 3
+  - 🇳🇱 荷兰 | NLD 9
+  - 🇹🇷 土耳其 | TUR 2
   - 🇬🇧 英国 | GBR
-  - 🇵🇱 波兰 | POL 3
-  - 🇰🇷 韩国 | KOR 14
-  - KR - zhuhai.uk 30
   - KR - zhuhai.uk 02
   - RO - zhuhai.uk 10
-  - RO - zhuhai.uk 08
   - KR - zhuhai.uk 15
+  - 🇳🇱 荷兰 | NLD 5
   - DE - zhuhai.uk 02
   - 🇰🇷 韩国 | KOR 7
+  - 🇪🇸 西班牙 | ESP
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: HK-POOL
@@ -2201,47 +2096,51 @@ proxy-groups:
   - 🇭🇰 香港 | HKG 7
   - 🇭🇰 香港 | HKG 2
   - HK - zhuhai.uk 06
-  - HK - zhuhai.uk 05
   - 🇭🇰 香港 | HKG 4
   - HK - zhuhai.uk 07
+  - 🇭🇰 香港 | HKG 5
+  - 🇭🇰 香港 | HKG 10
   - 🇭🇰 香港 | HKG
+  - 🇭🇰 香港 | HKG 11
+  - 🇭🇰 香港 | HKG 8
   - HK - zhuhai.uk 01
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: JP-POOL
   type: url-test
   proxies:
+  - JP - zhuhai.uk 37
   - JP - zhuhai.uk 72
+  - JP - zhuhai.uk 44
   - JP - zhuhai.uk 03
   - JP - zhuhai.uk 17
   - JP - zhuhai.uk 61
-  - 🇯🇵 日本 | JPN 5
   - JP - zhuhai.uk 26
+  - 🇯🇵 日本 | JPN 5
   - JP - zhuhai.uk 12
   - JP - zhuhai.uk 63
   - JP - zhuhai.uk 07
   - JP - zhuhai.uk 54
-  - JP - zhuhai.uk 15
+  - 🇯🇵 日本 | JPN 12
   - JP - zhuhai.uk 01
   - JP - zhuhai.uk 28
   - JP - zhuhai.uk 41
-  - JP - zhuhai.uk 19
   - JP - zhuhai.uk 23
-  - JP - zhuhai.uk 71
   - JP - zhuhai.uk 20
   - JP - zhuhai.uk 67
   - JP - zhuhai.uk 39
+  - 🇯🇵 日本 | JPN 11
+  - 🇯🇵 日本 | JPN 10
   - JP - zhuhai.uk 18
   - JP - zhuhai.uk 21
   - JP - zhuhai.uk 59
   - JP - zhuhai.uk 13
   - JP - zhuhai.uk 29
   - JP - zhuhai.uk 38
-  - JP - zhuhai.uk 22
+  - JP - zhuhai.uk 02
   - 🇯🇵 日本 | JPN 8
-  - 🇯🇵 日本 | JPN 9
+  - JP - zhuhai.uk 22
   - 🇯🇵 日本 | JPN 2
-  - 🇯🇵 日本 | JPN 7
   - 🇯🇵 日本 | JPN 6
   - 🇯🇵 日本 | JPN 3
   - JP - zhuhai.uk 74
@@ -2255,7 +2154,6 @@ proxy-groups:
   - JP - zhuhai.uk 36
   - JP - zhuhai.uk 30
   - JP - zhuhai.uk 33
-  - JP - zhuhai.uk 60
   - 🇯🇵 日本 | JPN 4
   - JP - zhuhai.uk 08
   - JP - zhuhai.uk 55
@@ -2266,7 +2164,6 @@ proxy-groups:
   - JP - zhuhai.uk 35
   - JP - zhuhai.uk 66
   - JP - zhuhai.uk 31
-  - JP - zhuhai.uk 25
   - JP - zhuhai.uk 69
   - JP - zhuhai.uk 53
   - JP - zhuhai.uk 09
@@ -2278,16 +2175,15 @@ proxy-groups:
   - JP - zhuhai.uk 56
   - JP - zhuhai.uk 75
   - JP - zhuhai.uk 46
-  - JP - zhuhai.uk 40
   - JP - zhuhai.uk 64
+  - JP - zhuhai.uk 40
   - JP - zhuhai.uk 14
   - JP - zhuhai.uk 73
   - JP - zhuhai.uk 34
   - JP - zhuhai.uk 58
-  - JP - zhuhai.uk 48
   - JP - zhuhai.uk 49
-  - JP - zhuhai.uk 24
   - JP - zhuhai.uk 06
+  - JP - zhuhai.uk 24
   - JP - zhuhai.uk 70
   - JP - zhuhai.uk 05
   - JP - zhuhai.uk 16
@@ -2296,35 +2192,32 @@ proxy-groups:
 - name: US-POOL
   type: url-test
   proxies:
+  - us|b3d2|puddincat07@Telegram
   - US - zhuhai.uk 09
-  - 🇺🇸 美国 | USA 11
+  - US - zhuhai.uk 07
   - us|b395|puddincat07@Telegram
-  - us|9165|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 26
   - 🇺🇸 美国 | USA 20
-  - 🇺🇸 美国 | USA 25
-  - US - zhuhai.uk 08
-  - 🇺🇸 美国 | USA 16
-  - us|2a14|puddincat07@Telegram
+  - 🇺🇸 美国 | USA 9
+  - 🇺🇸 美国 | USA 8
+  - 🇺🇸 美国 | USA 24
+  - us|9f71|puddincat07@Telegram
   - us|cc28|puddincat07@Telegram
+  - US - zhuhai.uk 08
   - 🇺🇸 美国 | USA 6
-  - 🇺🇸 美国 | USA 3
-  - 🇺🇸 美国 | USA 10
-  - us|f508|puddincat07@Telegram
   - US - zhuhai.uk 04
+  - US - zhuhai.uk 05
+  - 🇺🇸 美国 | USA 3
+  - us|f508|puddincat07@Telegram
   - 🇺🇸 美国 | USA 5
-  - us|4896|puddincat07@Telegram
-  - 🇺🇸 美国 | USA
   - US - zhuhai.uk 06
+  - 🇺🇸 美国 | USA 10
   - 🇺🇸 美国 | USA 19
-  - US - zhuhai.uk 02
   - 🇺🇸 美国 | USA 15
-  - US - zhuhai.uk
-  - 🇺🇸 美国 | USA 14
+  - US - zhuhai.uk 02
   - US - zhuhai.uk 01
-  - 🇺🇸 美国 | USA 23
+  - 🇺🇸 美国 | USA 22
+  - us|b84c|puddincat07@Telegram
   - US - zhuhai.uk 10
-  - 🇺🇸 美国 | USA 28
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: AI-POOL
@@ -2334,17 +2227,17 @@ proxy-groups:
   - 🇭🇰 香港 | HKG 7
   - 🇭🇰 香港 | HKG 2
   - HK - zhuhai.uk 06
-  - HK - zhuhai.uk 05
+  - 🇭🇰 香港 | HKG 4
+  - JP - zhuhai.uk 37
   - JP - zhuhai.uk 72
+  - JP - zhuhai.uk 44
   - JP - zhuhai.uk 03
   - JP - zhuhai.uk 17
-  - JP - zhuhai.uk 61
-  - 🇯🇵 日本 | JPN 5
+  - us|b3d2|puddincat07@Telegram
   - US - zhuhai.uk 09
-  - 🇺🇸 美国 | USA 11
+  - US - zhuhai.uk 07
   - us|b395|puddincat07@Telegram
-  - us|9165|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 26
+  - 🇺🇸 美国 | USA 20
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: FALLBACK
