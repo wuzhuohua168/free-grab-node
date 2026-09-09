@@ -31,7 +31,15 @@ curl -sL https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/depl
 - 同时生成 Clash、Shadowrocket、V2Ray 三种订阅格式
 - 支持全部主流代理协议（SS/SSR/VMess/VLESS/Trojan/Hysteria2/TUIC/HTTP/SOCKS5）
 - 真实代理延迟测试，精准过滤无效节点
-- GitHub Actions 每30分钟全自动更新```
+- GitHub Actions 每30分钟全自动更新
+
+## 订阅链接
+
+| 客户端 | 订阅地址 |
+|---|---|
+| Clash | https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/output/clash.yaml |
+| Shadowrocket | https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/output/rocket.txt |
+| V2Ray | https://raw.githubusercontent.com/wuzhuohua168/free-grab-node/main/output/v2ray.txt |
 
 在客户端中新建订阅，类型选择对应的格式，填入链接即可。
 
@@ -61,10 +69,7 @@ free-grab-node/
 ```
 
 ## 自动更新
-- Shadowrocket: https://wuzhuohua168.github.io/free-grab-node/rocket.txt
-- Clash: https://wuzhuohua168.github.io/free-grab-node/clash.yaml
-- V2Ray: https://wuzhuohua168.github.io/free-grab-node/v2ray.txt
-  
+
 GitHub Actions 每30分钟自动运行，流程：
 
 1. 从各节点源获取最新节点
