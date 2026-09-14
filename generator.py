@@ -100,6 +100,41 @@ SUPPORTED_PROXY_TYPES = {
     "http",
 }
 
+# ---------- 分流规则目录(同步自 node-conversion-tool / RULES.md) ----------
+# 37 组远程规则集(blackmatrix7/ios_rule_script),策略 DIRECT / PROXY
+RULE_ENTRIES = [
+    ("AppleNews", "PROXY"), ("Apple", "DIRECT"), ("BiliBili", "DIRECT"), ("NetEaseMusic", "DIRECT"),
+    ("Baidu", "DIRECT"), ("DouBan", "DIRECT"), ("WeChat", "DIRECT"), ("DouYin", "DIRECT"),
+    ("Sina", "DIRECT"), ("Zhihu", "DIRECT"), ("XiaoHongShu", "DIRECT"),
+    ("YouTube", "PROXY"), ("Netflix", "PROXY"), ("Disney", "PROXY"), ("HBO", "PROXY"),
+    ("Spotify", "PROXY"), ("Telegram", "PROXY"), ("PayPal", "PROXY"), ("Twitter", "PROXY"),
+    ("Facebook", "PROXY"), ("Amazon", "PROXY"), ("OpenAI", "PROXY"), ("Sony", "DIRECT"),
+    ("Nintendo", "DIRECT"), ("Epic", "DIRECT"), ("SteamCN", "DIRECT"), ("Steam", "DIRECT"),
+    ("Game", "DIRECT"), ("GitHub", "PROXY"), ("Microsoft", "DIRECT"), ("Google", "PROXY"),
+    ("TikTok", "PROXY"), ("TVB", "PROXY"), ("Speedtest", "PROXY"), ("Global", "PROXY"),
+    ("China", "DIRECT"), ("Lan", "DIRECT"),
+]
+BM7_BASE = "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule"
+
+# 内联直连白名单(Apple 认证 + 国内 AI 工具),优先级高于远程规则集,不依赖规则集下载
+APPLE_DIRECT_DOMAINS = ["apple.com", "icloud.com", "mzstatic.com", "apple-dns.net"]
+DOMESTIC_AI_DIRECT_DOMAINS = [
+    "traework.cn", "trae.cn", "workbuddy.cn", "bestvirtualgoods.com",
+    "volces.com", "volcengine.com", "deepseek.com", "dashscope.aliyuncs.com",
+    "bigmodel.cn", "moonshot.cn", "siliconflow.cn",
+]
+INLINE_DIRECT_DOMAINS = APPLE_DIRECT_DOMAINS + DOMESTIC_AI_DIRECT_DOMAINS
+# 强制走代理域名(预留:确有必须走代理才通的域名时填入,写父域名,DOMAIN-SUFFIX 自动覆盖子域)
+FORCE_PROXY_DOMAINS: list[str] = []
+
+# AI 服务走 AI-POOL 策略组(本项目特有,优先级最高)
+AI_POOL_RULES = [
+    ("openai.com", "AI-POOL"),
+    ("chatgpt.com", "AI-POOL"),
+    ("claude.ai", "AI-POOL"),
+    ("anthropic.com", "AI-POOL"),
+]
+
 
 @dataclass
 class ProxyMetric:
@@ -632,7 +667,7 @@ def find_free_port() -> int:
 
 
 def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
-    """生成Clash配置文件（与原项目一致：输出全部通过节点 + 性能优化配置）"""
+    """生成Clash配置文件(同步自 node-conversion-tool 的完整分流规则 + 抗DNS污染)"""
     metrics.sort(key=lambda m: m.health_score, reverse=True)
     valid_metrics = metrics
 
@@ -649,6 +684,48 @@ def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
     us_proxies = [m.proxy["name"] for m in valid_metrics if m.region == "US"]
     ai_proxies = hk_proxies[:5] + jp_proxies[:5] + us_proxies[:5]
 
+    # ---- 抗 DNS 污染的 dns 段(同步自 node-conversion-tool) ----
+    dns_config = {
+        "enable": True,
+        "ipv6": False,
+        "listen": "0.0.0.0:1053",
+        "use-hosts": True,
+        "respect-rules": False,
+        "default-nameserver": ["223.5.5.5", "119.29.29.29"],
+        "proxy-server-nameserver": ["https://dns.quad9.net/dns-query#DIRECT", "223.5.5.5"],
+        "direct-nameserver": ["https://dns.quad9.net/dns-query#DIRECT", "223.5.5.5", "119.29.29.29"],
+        "enhanced-mode": "fake-ip",
+        "fake-ip-range": "198.18.0.1/16",
+        "fake-ip-filter": [
+            "*.lan", "*.local", "*.localhost",
+            "+.msftconnecttest.com", "+.msftncsi.com", "stun.*",
+            "+.apple.com", "+.icloud.com", "+.mzstatic.com", "ocsp.apple.com",
+            "+.traework.cn", "+.trae.cn", "+.workbuddy.cn",
+        ],
+        "nameserver": ["223.5.5.5", "119.29.29.29", "https://dns.quad9.net/dns-query#DIRECT"],
+        "fallback": ["https://dns.quad9.net/dns-query#PROXY", "tls://9.9.9.9:853#PROXY", "https://dns.google/resolve#PROXY"],
+        "fallback-filter": {"geoip": True, "geoip-code": "CN", "domain": ["+.google.com", "+.googleapis.com", "+.gstatic.com", "+.github.com", "+.githubusercontent.com", "+.openai.com", "+.youtube.com", "+.googlevideo.com"]},
+    }
+
+    # ---- rule-providers(37 个远程规则集, 每日刷新) ----
+    rule_providers = {
+        rname: {
+            "type": "http",
+            "behavior": "classical",
+            "url": f"{BM7_BASE}/Clash/{rname}/{rname}.yaml",
+            "path": f"./rule-providers/{rname}.yaml",
+            "interval": 86400,
+        }
+        for rname, _ in RULE_ENTRIES
+    }
+
+    # ---- 规则列表(顺序: AI优先 > 远程规则集 > 强制代理 > 直连 > GEOIP > 兜底) ----
+    rules = [f"DOMAIN-SUFFIX,{d},{policy}" for d, policy in AI_POOL_RULES]
+    rules += [f"RULE-SET,{rname},{policy}" for rname, policy in RULE_ENTRIES]
+    rules += [f"DOMAIN-SUFFIX,{d},PROXY" for d in FORCE_PROXY_DOMAINS]
+    rules += [f"DOMAIN-SUFFIX,{d},DIRECT" for d in INLINE_DIRECT_DOMAINS]
+    rules += ["GEOIP,CN,DIRECT", "MATCH,PROXY"]
+
     config = {
         "mixed-port": 7890,
         "allow-lan": True,
@@ -660,6 +737,8 @@ def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
         "tcp-concurrent": True,
         "global-client-fingerprint": "chrome",
         "external-controller": "127.0.0.1:9090",
+
+        "dns": dns_config,
 
         "proxies": proxies,
 
@@ -713,14 +792,9 @@ def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
             },
         ],
 
-        "rules": [
-            "DOMAIN-SUFFIX,openai.com,AI-POOL",
-            "DOMAIN-SUFFIX,chatgpt.com,AI-POOL",
-            "DOMAIN-SUFFIX,claude.ai,AI-POOL",
-            "DOMAIN-SUFFIX,anthropic.com,AI-POOL",
-            "GEOIP,CN,DIRECT",
-            "MATCH,PROXY",
-        ],
+        "rule-providers": rule_providers,
+
+        "rules": rules,
     }
 
     return config
