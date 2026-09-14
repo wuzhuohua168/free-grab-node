@@ -30,10 +30,12 @@ from urllib.parse import quote
 import requests
 import yaml
 
-VERSION = "v1.2.2"
+VERSION = "v1.3.0"
 CLASH_OUTPUT = Path("output/clash.yaml")
 ROCKET_OUTPUT = Path("output/rocket.txt")
 V2RAY_OUTPUT = Path("output/v2ray.txt")
+# 坏节点黑名单(CI 每 30 分钟从 GitHub Issues 自动解析更新): 列出 server:port 直接过滤
+BLOCKLIST_PATH = Path("blocked.txt")
 # 测速探针:多个目标 URL 交叉验证,避免单 URL 假活(节点对 gstatic 通 ≠ 真实可用)
 #  - gstatic generate_204:轻量连通性(原逻辑)
 #  - gstatic 首页:完整 HTTP 响应(验证非"只握手不传输")
@@ -386,6 +388,35 @@ def proxy_fingerprint(proxy: dict[str, Any]) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def block_key(proxy: dict[str, Any]) -> str:
+    """生成节点屏蔽键: 归一化 server:port(域名转小写, 去除首尾点与空格)"""
+    server = str(proxy.get("server", "")).strip().lower().rstrip(".")
+    port = proxy.get("port")
+    return f"{server}:{port}" if port else server
+
+
+def load_blocklist() -> set[str]:
+    """读取 blocked.txt 黑名单(每行一个 server:port, # 开头为注释)"""
+    blocked: set[str] = set()
+    if not BLOCKLIST_PATH.exists():
+        return blocked
+    try:
+        for line in BLOCKLIST_PATH.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            entry = line.lower().rstrip(".")
+            if ":" in entry:
+                host, _, port = entry.rpartition(":")
+                if host and port.isdigit():
+                    blocked.add(entry)
+            elif re.fullmatch(r"[\w.\-]+", entry):
+                blocked.add(entry)
+    except Exception as exc:
+        print(f"[WARN] 读取黑名单失败: {exc}")
+    return blocked
+
+
 def detect_region(proxy: dict[str, Any]) -> str:
     """检测代理节点地区（正则+emoji+unicode，与参考项目一致）"""
     name = str(proxy.get("name", ""))
@@ -726,14 +757,16 @@ def find_free_port() -> int:
         return int(sock.getsockname()[1])
 
 
-def build_meta_header(total_collected: int = 0, kept: int = 0) -> str:
-    """生成订阅文件头注释:写入生成时间、测速出口、大陆可达性提示、反馈入口。"""
+def build_meta_header(total_collected: int = 0, kept: int = 0, blocked: int = 0) -> str:
+    """生成订阅文件头注释:写入生成时间、测速出口、大陆可达性提示、反馈入口、黑名单统计。"""
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+    blocked_line = f"# 众包黑名单: 已屏蔽 {blocked} 个坏节点 (反馈: Issues 模板)\n" if blocked else ""
     return (
         f"# free-grab-node {VERSION} | 生成时间 {now}\n"
         f"# 测速出口: 海外 GitHub Actions (美国) —— 仅验证「节点→海外」可达\n"
         f"# 大陆可达性: 未经本地探针验证(本项目无国内云探针), 导入后请先在客户端测速筛选\n"
         f"# 坏节点反馈: https://github.com/wuzhuohua168/free-grab-node/issues\n"
+        f"{blocked_line}"
         f"# 本轮收集 {total_collected} 节点, 去重后 {kept} 节点通过精测\n"
     )
 
@@ -1108,6 +1141,13 @@ def main() -> None:
     total_collected, proxies = collect_proxies()
     print(f"[OK] 收集到 {total_collected} 个节点，去重后 {len(proxies)} 个")
 
+    # 众包黑名单: 过滤被用户反馈为坏节点/大陆不可用的 server:port
+    blocklist = load_blocklist()
+    if blocklist:
+        before = len(proxies)
+        proxies = [p for p in proxies if block_key(p) not in blocklist]
+        print(f"[OK] 黑名单过滤: 屏蔽 {before - len(proxies)} 个坏节点 (共 {len(blocklist)} 条)")
+
     # mihomo 真实代理延迟测试（所有节点直接进 mihomo，与原项目一致）
     metrics: list[ProxyMetric] = []
     if proxies:
@@ -1133,7 +1173,7 @@ def main() -> None:
     config = generate_clash_config(metrics, meta_total=total_collected)
     CLASH_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with CLASH_OUTPUT.open("w", encoding="utf-8") as f:
-        f.write(build_meta_header(total_collected=total_collected, kept=len(metrics)))
+        f.write(build_meta_header(total_collected=total_collected, kept=len(metrics), blocked=len(blocklist)))
         yaml.safe_dump(config, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT} ({len(config.get('proxies', []))} 节点)")
 
