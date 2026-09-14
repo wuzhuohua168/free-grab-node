@@ -786,9 +786,15 @@ def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
                 "interval": 120,
             },
             {
+                "name": "LOAD-BALANCE",
+                "type": "load-balance",
+                "strategy": "round-robin",
+                "proxies": proxy_names,
+            },
+            {
                 "name": "PROXY",
                 "type": "select",
-                "proxies": ["AUTO-FAST", "FALLBACK"],
+                "proxies": ["AUTO-FAST", "LOAD-BALANCE", "FALLBACK"],
             },
         ],
 
