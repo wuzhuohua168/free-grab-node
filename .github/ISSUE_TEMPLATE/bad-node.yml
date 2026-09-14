@@ -1,0 +1,37 @@
+name: 坏节点反馈 / Bad Node Report
+description: 报告一个无法使用/假活的节点，帮助大家避开大陆不可用的坏节点
+title: "[坏节点] "
+labels: ["bad-node"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈!你报告的节点会被 CI 自动解析并加入黑名单, 后续生成的订阅里不再包含它。
+        多个节点请用逗号或换行分隔。
+  - type: input
+    id: nodes
+    attributes:
+      label: 坏节点地址 (server:port)
+      description: 例如 1.2.3.4:443 或 example.com:8443, 多个用逗号分隔
+      placeholder: "1.2.3.4:443, 5.6.7.8:8443"
+    validations:
+      required: true
+  - type: dropdown
+    id: symptom
+    attributes:
+      label: 主要问题
+      options:
+        - "连接超时 / 连不上"
+        - "测速通过但无法翻墙 (假活)"
+        - "速度极慢 / 频繁断线"
+        - "其他"
+    validations:
+      required: false
+  - type: textarea
+    id: note
+    attributes:
+      label: 补充说明 (可选)
+      description: 你所在的网络环境 / 客户端 / 复现步骤等
+      placeholder: "例如: 上海电信 + Clash Verge, 导入后全部超时"
+    validations:
+      required: false
