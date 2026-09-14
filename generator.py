@@ -34,9 +34,22 @@ VERSION = "v1.2.2"
 CLASH_OUTPUT = Path("output/clash.yaml")
 ROCKET_OUTPUT = Path("output/rocket.txt")
 V2RAY_OUTPUT = Path("output/v2ray.txt")
-TEST_URL = "http://www.gstatic.com/generate_204"
+# 测速探针:多个目标 URL 交叉验证,避免单 URL 假活(节点对 gstatic 通 ≠ 真实可用)
+#  - gstatic generate_204:轻量连通性(原逻辑)
+#  - gstatic 首页:完整 HTTP 响应(验证非"只握手不传输")
+#  - 1.1.1.1:境外 IP 直连(验证基础出口,无 DNS 依赖)
+TEST_URLS = [
+    "http://www.gstatic.com/generate_204",
+    "https://www.gstatic.com/",
+    "https://1.1.1.1/",
+]
+TEST_URL = TEST_URLS[0]
 SOURCE_TIMEOUT = 25
 LATENCY_TIMEOUT_MS = 5000
+# 丢包探测:同一节点连发多次,统计失败次数(免费节点常"单测能过、并发/多次就挂")
+LOSS_PROBE_COUNT = 3          # 每个节点连测次数
+LOSS_PROBE_MAX_FAIL = 1       # 允许的最大失败次数(>=2 次失败即判死,比原逻辑更严)
+MIN_PASS_URLS = 2             # 多个 URL 中至少几个要通才算过
 MAX_RETRIES = 3
 MAX_WORKERS = int(os.getenv("FREE_PROXY_MAX_WORKERS", "24"))
 MAX_CANDIDATES = int(os.getenv("FREE_PROXY_MAX_CANDIDATES", "0"))  # 0=不限制，与原作者项目一致
@@ -589,20 +602,67 @@ def _wait_for_controller(controller_url: str, process: subprocess.Popen[str]) ->
     raise RuntimeError("Mihomo controller did not become ready")
 
 
+def _probe_one(controller_url: str, name: str, url: str, udp: bool = False) -> int | None:
+    """对单个 URL 做一次延迟探测,返回延迟(ms)或 None(失败)。udp=True 时走 UDP 探针。"""
+    api = f"{controller_url}/proxies/{quote(name, safe='')}/delay"
+    params = f"timeout={LATENCY_TIMEOUT_MS}&url={quote(url, safe='')}"
+    if udp:
+        params += "&udp=true"
+    try:
+        resp = requests.get(f"{api}?{params}", timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
+    except Exception:
+        return None
+    if resp.status_code != 200:
+        return None
+    try:
+        delay = int(resp.json().get("delay", 0))
+    except Exception:
+        return None
+    if delay <= 0 or delay > LATENCY_TIMEOUT_MS:
+        return None
+    return delay
+
+
 def _test_single_proxy(controller_url: str, proxy: dict[str, Any]) -> ProxyMetric | None:
-    """通过 mihomo 引擎测试单个代理节点（单URL测试，与参考项目一致）"""
+    """通过 mihomo 引擎测试单个代理节点。
+
+    零成本增强(不改架构、不依赖国内云):
+    1) 多 URL 交叉验证:TEST_URLS 中至少 MIN_PASS_URLS 个通才算过,避免单 URL 假活。
+    2) 丢包探测:同一节点连发 LOSS_PROBE_COUNT 次,失败 >= LOSS_PROBE_MAX_FAIL 直接判死。
+    3) UDP 探针:hysteria2/tuic 等 UDP 协议额外走 udp=true 探测,否则只验证了 TCP 握手。
+    """
     name = str(proxy["name"])
-    url = (
-        f"{controller_url}/proxies/{quote(name, safe='')}/delay"
-        f"?timeout={LATENCY_TIMEOUT_MS}&url={quote(TEST_URL, safe='')}"
-    )
-    response = requests.get(url, timeout=(LATENCY_TIMEOUT_MS / 1000) + 3)
-    if response.status_code != 200:
+    proxy_type = str(proxy.get("type", "")).lower()
+
+    # --- 多 URL 连通性交叉验证 ---
+    passed = 0
+    latencies: list[int] = []
+    for url in TEST_URLS:
+        d = _probe_one(controller_url, name, url)
+        if d is not None:
+            passed += 1
+            latencies.append(d)
+    if passed < MIN_PASS_URLS:
         return None
-    data = response.json()
-    latency = int(data.get("delay", 0))
-    if latency <= 0 or latency > LATENCY_TIMEOUT_MS:
-        return None
+
+    # --- 丢包探测:对主探测 URL 再发几次,统计失败 ---
+    loss_fail = 0
+    for _ in range(LOSS_PROBE_COUNT - 1):
+        d = _probe_one(controller_url, name, TEST_URL)
+        if d is None:
+            loss_fail += 1
+            if loss_fail >= LOSS_PROBE_MAX_FAIL:
+                return None
+
+    # --- UDP 协议额外探针 ---
+    if proxy_type in ("hysteria2", "hysteria", "tuic"):
+        udp_ok = any(
+            _probe_one(controller_url, name, u, udp=True) is not None for u in TEST_URLS
+        )
+        if not udp_ok:
+            return None
+
+    latency = int(sum(latencies) / len(latencies))
     region = detect_region(proxy)
     score = health_score(name, latency, region)
     return ProxyMetric(proxy=proxy, latency=latency, region=region, health_score=score)
@@ -666,7 +726,19 @@ def find_free_port() -> int:
         return int(sock.getsockname()[1])
 
 
-def generate_clash_config(metrics: list[ProxyMetric]) -> dict[str, Any]:
+def build_meta_header(total_collected: int = 0, kept: int = 0) -> str:
+    """生成订阅文件头注释:写入生成时间、测速出口、大陆可达性提示、反馈入口。"""
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+    return (
+        f"# free-grab-node {VERSION} | 生成时间 {now}\n"
+        f"# 测速出口: 海外 GitHub Actions (美国) —— 仅验证「节点→海外」可达\n"
+        f"# 大陆可达性: 未经本地探针验证(本项目无国内云探针), 导入后请先在客户端测速筛选\n"
+        f"# 坏节点反馈: https://github.com/wuzhuohua168/free-grab-node/issues\n"
+        f"# 本轮收集 {total_collected} 节点, 去重后 {kept} 节点通过精测\n"
+    )
+
+
+def generate_clash_config(metrics: list[ProxyMetric], meta_total: int = 0) -> dict[str, Any]:
     """生成Clash配置文件(同步自 node-conversion-tool 的完整分流规则 + 抗DNS污染)"""
     metrics.sort(key=lambda m: m.health_score, reverse=True)
     valid_metrics = metrics
@@ -1058,13 +1130,15 @@ def main() -> None:
     metrics.sort(key=lambda m: m.health_score, reverse=True)
 
     # 生成Clash配置（输出全部通过节点）
-    config = generate_clash_config(metrics)
+    config = generate_clash_config(metrics, meta_total=total_collected)
     CLASH_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with CLASH_OUTPUT.open("w", encoding="utf-8") as f:
+        f.write(build_meta_header(total_collected=total_collected, kept=len(metrics)))
         yaml.safe_dump(config, f, allow_unicode=True, sort_keys=False, default_flow_style=False)
     print(f"[OK] Clash配置已生成: {CLASH_OUTPUT} ({len(config.get('proxies', []))} 节点)")
 
     # 生成Shadowrocket + V2Ray订阅（输出全部通过节点，与原项目一致）
+    # 注: 这两类订阅是纯 base64 节点列表, 不支持注释头; 元信息只在 Clash 配置的 YAML 头暴露。
     rocket_proxies = [m.proxy for m in metrics]
     rocket_content = generate_shadowrocket_sub(rocket_proxies)
     with ROCKET_OUTPUT.open("w", encoding="utf-8") as f:
