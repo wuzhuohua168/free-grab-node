@@ -10,8 +10,8 @@ cf_ip_optimize.py —— 本地优选 Cloudflare IP 并推送到 GitHub 仓库
     再可选通知 OpenClash / Nikki 刷新代理。edgetunnel 订阅这个 raw 文件即可。
 
 为什么必须本地跑、不能放 GitHub Actions：
-    GitHub 的 runner 不在你的宽带里，从它测出的"延迟"对你毫无意义。
-    优选的本质是"从你家网络出口测量到各 CF 节点的延迟"，所以要在 NAS 本地执行。
+    GitHub 的 runner 不在你的宽带里，从它测出的“延迟”对你毫无意义。
+    优选的本质是“从你家网络出口测量到各 CF 节点的延迟”，所以要在 NAS 本地执行。
 
 仅依赖 Python 标准库，无需 pip install。
 
@@ -53,6 +53,31 @@ CF_IPS_V4_URL = "https://www.cloudflare.com/ips-v4"
 GITHUB_API = "https://api.github.com/repos"
 BEIJING = timezone(timedelta(hours=8))
 
+# CF 官方 IPv4 段兜底列表（拉取失败时启用，避免完全跑不起来）
+CF_CIDRS_FALLBACK = [
+    "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22",
+    "141.101.64.0/18", "108.162.192.0/18", "190.93.240.0/20", "188.114.96.0/20",
+    "197.234.240.0/22", "198.41.128.0/17", "162.158.0.0/16", "104.16.0.0/13",
+    "104.24.0.0/14", "172.64.0.0/13", "131.0.72.0/22",
+]
+
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) cf-ip-optimizer"
+
+
+def build_opener():
+    """带 UA 与代理支持的 opener（Cloudflare 会拦截默认 Python UA）。"""
+    handlers = []
+    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+    if proxy:
+        handlers.append(urllib.request.ProxyHandler({"http": proxy, "https": proxy}))
+        log("使用代理:", proxy)
+    opener = urllib.request.build_opener(*handlers)
+    opener.addheaders = [("User-Agent", UA)]
+    return opener
+
+
+OPENER = build_opener()
+
 
 def log(*a):
     print(f"[{datetime.now().strftime('%H:%M:%S')}]", *a, flush=True)
@@ -61,12 +86,15 @@ def log(*a):
 # ---------- 1. 候选 IP ----------
 def fetch_cf_cidrs(url):
     try:
-        with urllib.request.urlopen(url, timeout=15) as r:
+        with OPENER.open(url, timeout=15) as r:
             txt = r.read().decode()
-        return [l.strip() for l in txt.splitlines() if l.strip() and "/" in l]
+        cidrs = [l.strip() for l in txt.splitlines() if l.strip() and "/" in l]
+        if cidrs:
+            return cidrs
+        log("拉取到的内容为空，改用内置兜底段")
     except Exception as e:
-        log("拉取 CF 官方段失败:", e)
-        return []
+        log("拉取 CF 官方段失败:", e, "-> 改用内置兜底段")
+    return list(CF_CIDRS_FALLBACK)
 
 
 def build_candidates(cidrs, per_cidr=200, max_total=6000):
@@ -107,6 +135,8 @@ def tcp_ping(ip, port, timeout, samples=3):
 def scan(candidates, ports, timeout, workers):
     results = {}
     tasks = [(ip, p) for ip in candidates for p in ports]
+    total = len(tasks)
+    done = 0
 
     def work(task):
         ip, p = task
@@ -115,6 +145,9 @@ def scan(candidates, ports, timeout, workers):
 
     with cf.ThreadPoolExecutor(max_workers=workers) as ex:
         for ip, p, avg in ex.map(work, tasks):
+            done += 1
+            if done % 2000 == 0 or done == total:
+                log(f"  进度 {done}/{total}，已有 {len(results)} 个有效 IP")
             if avg is None:
                 continue
             cur = results.get(ip)
@@ -151,7 +184,7 @@ def github_put(token, repo, path, branch, content, message):
     sha = None
     try:
         req = urllib.request.Request(f"{api}?ref={branch}", headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as r:
+        with OPENER.open(req, timeout=15) as r:
             sha = json.loads(r.read().decode()).get("sha")
     except urllib.error.HTTPError as e:
         if e.code != 404:
@@ -166,7 +199,7 @@ def github_put(token, repo, path, branch, content, message):
     req = urllib.request.Request(
         api, data=json.dumps(body).encode(), headers=headers, method="PUT"
     )
-    with urllib.request.urlopen(req, timeout=15) as r:
+    with OPENER.open(req, timeout=15) as r:
         return r.status
 
 
@@ -190,7 +223,7 @@ def clash_refresh(args):
             method="PUT",
         )
         try:
-            with urllib.request.urlopen(req, timeout=10) as r:
+            with OPENER.open(req, timeout=10) as r:
                 log("已通知 mihomo/OpenClash 刷新订阅:", r.status)
         except Exception as e:
             log("mihomo 刷新失败（可忽略，edgetunnel 会自行拉取新 IP）:", e)
