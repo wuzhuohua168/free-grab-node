@@ -139,8 +139,12 @@ DOMESTIC_AI_DIRECT_DOMAINS = [
     "bigmodel.cn", "moonshot.cn", "siliconflow.cn",
 ]
 INLINE_DIRECT_DOMAINS = APPLE_DIRECT_DOMAINS + DOMESTIC_AI_DIRECT_DOMAINS
-# 强制走代理域名(预留:确有必须走代理才通的域名时填入,写父域名,DOMAIN-SUFFIX 自动覆盖子域)
-FORCE_PROXY_DOMAINS: list[str] = []
+# 强制走代理域名(写父域名,DOMAIN-SUFFIX 自动覆盖子域)
+# workbuddy.ai: WorkBuddy 国际版(海外部署),国内直连不稳/打不开,必须走代理
+# 注:workbuddy.cn(国内版)在上面 INLINE_DIRECT_DOMAINS 走 DIRECT,两者共存不冲突
+FORCE_PROXY_DOMAINS: list[str] = [
+    "workbuddy.ai",
+]
 
 # AI 服务走 AI-POOL 策略组(本项目特有,优先级最高)
 AI_POOL_RULES = [
@@ -807,6 +811,7 @@ def generate_clash_config(metrics: list[ProxyMetric], meta_total: int = 0) -> di
             "+.apple.com", "+.icloud.com", "+.mzstatic.com", "ocsp.apple.com",
             "+.traework.cn", "+.trae.cn", "+.workbuddy.cn",
         ],
+        # 注:workbuddy.ai 是国际版,走代理,DNS 由代理出口解析,不需加入 fake-ip-filter(参考 node-conversion-tool RULES.md 第 2 节)
         "nameserver": ["223.5.5.5", "119.29.29.29", "https://dns.quad9.net/dns-query#DIRECT"],
         "fallback": ["https://dns.quad9.net/dns-query#PROXY", "tls://9.9.9.9:853#PROXY", "https://dns.google/resolve#PROXY"],
         "fallback-filter": {"geoip": True, "geoip-code": "CN", "domain": ["+.google.com", "+.googleapis.com", "+.gstatic.com", "+.github.com", "+.githubusercontent.com", "+.openai.com", "+.youtube.com", "+.googlevideo.com"]},
