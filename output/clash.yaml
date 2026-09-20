@@ -1,8 +1,8 @@
-# free-grab-node v1.3.0 | 生成时间 2026-09-20T21:43Z
+# free-grab-node v1.3.0 | 生成时间 2026-09-20T23:43Z
 # 测速出口: 海外 GitHub Actions (美国) —— 仅验证「节点→海外」可达
 # 大陆可达性: 未经本地探针验证(本项目无国内云探针), 导入后请先在客户端测速筛选
 # 坏节点反馈: https://github.com/wuzhuohua168/free-grab-node/issues
-# 本轮收集 362 节点, 去重后 62 节点通过精测
+# 本轮收集 367 节点, 去重后 67 节点通过精测
 mixed-port: 7890
 allow-lan: true
 bind-address: '*'
@@ -66,14 +66,6 @@ dns:
     - +.youtube.com
     - +.googlevideo.com
 proxies:
-- name: JP - zhuhai.uk 03
-  type: http
-  server: fan.571589.xyz
-  port: 443
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: fan.571589.xyz
 - name: 🇭🇰 香港 | HKG 7
   server: 45.152.66.160
   port: 2581
@@ -134,6 +126,14 @@ proxies:
   client-fingerprint: chrome
   network: tcp
   udp: true
+- name: JP - zhuhai.uk 02
+  type: http
+  server: fan.571589.xyz
+  port: 443
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: fan.571589.xyz
 - name: 🇯🇵 日本 | JPN 2
   server: adheres-scruple.quick-cdn.net
   port: 443
@@ -160,12 +160,6 @@ proxies:
   servername: www.cloudflare.com
   client-fingerprint: chrome
   network: tcp
-- name: SG - zhuhai.uk
-  type: ss
-  server: 152.69.223.67
-  port: 56927
-  cipher: 2022-blake3-chacha20-poly1305
-  password: dFodKJiNEMs6b5I5fLtQ7axZedHEdSsuiyhY7ewHCYk=
 - name: 🇸🇬 新加坡 | SGP
   server: 162.159.43.187
   port: 80
@@ -179,18 +173,28 @@ proxies:
     headers:
       Host: 8nj2r.2k8t.f88.hh.vavava.kdns.fr
   udp: true
+- name: SG - zhuhai.uk
+  type: ss
+  server: 168.107.93.50
+  port: 56927
+  cipher: 2022-blake3-chacha20-poly1305
+  password: oPSmGIzimdWL7HdyrWzXuDgim3IrT/VYo4trcdD+mtg=
+- name: HK - zhuhai.uk 03
+  type: vless
+  server: 207.57.133.51
+  port: 29896
+  uuid: 3767d445-9012-4f95-90ee-b5f15301dfe0
+  flow: xtls-rprx-vision
+  tls: true
+  servername: www.amazon.com
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: k_rgz9OgfRvruve7uGVmd8tHbDxS1h_Yh9C7FL2qHls
 - name: JP - zhuhai.uk
   type: http
   server: fan.571589.xyz
   port: 443
   tls: true
-  skip-cert-verify: true
-- name: JP - zhuhai.uk 04
-  type: hysteria2
-  server: msjp1.mangshe.xyz
-  port: 20561
-  password: 5d0a6445-a30d-4522-bb1f-94f1d3ad63be
-  sni: www.microsoft.com
   skip-cert-verify: true
 - name: 🇯🇵 日本 | JPN
   server: jp3.998998.best
@@ -206,26 +210,21 @@ proxies:
       Host: nat11.outsidemyheart.space
 - name: HK - zhuhai.uk 02
   type: vless
-  server: 38.147.171.99
-  port: 46042
-  uuid: 1e89e68f-eceb-4159-baee-2b77c9d34717
+  server: 207.57.134.242
+  port: 59672
+  uuid: d1ac7eb4-a6fd-481b-8c91-5c40680af484
   flow: xtls-rprx-vision
   tls: true
-  servername: dash.cloudflare.com
+  servername: www.amazon.com
   client-fingerprint: chrome
   reality-opts:
-    public-key: BjAkOapbZN6R4cUgz8Ye-o-uyWz6o_LoUlI5kbURMh0
+    public-key: MyT8CmpFM5SbEol-rsH-Gm-I8GJLAfRLQnGnyNCXrho
 - name: HK - zhuhai.uk
-  type: vless
-  server: 207.57.135.42
-  port: 30852
-  uuid: 10fdf9ce-3304-47cf-874b-9a3be30d5030
-  flow: xtls-rprx-vision
-  tls: true
-  servername: www.paypal.com
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: HN9gCD2plpOr5jSNJfv9Xcl2Zjj-AKvfbNmLBNYWcUc
+  type: socks5
+  server: 47.239.116.165
+  port: 1080
+  username: admin
+  password: admin
 - name: 🇭🇰 香港 | HKG 8
   server: 207.57.135.28
   port: 27659
@@ -239,6 +238,20 @@ proxies:
   client-fingerprint: chrome
   network: tcp
   udp: true
+- name: US - zhuhai.uk 09
+  type: http
+  server: 138.199.35.197
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  skip-cert-verify: true
+- name: US - zhuhai.uk 07
+  type: http
+  server: 138.199.35.199
+  port: 9002
+  tls: true
+  skip-cert-verify: true
 - name: us|c3d4|puddincat07@Telegram
   password: suAmQS9LlInNq4Wumh-FUF4GGlpgmG_g
   port: 8443
@@ -262,10 +275,11 @@ proxies:
   udp: true
 - name: US - zhuhai.uk 03
   type: http
-  server: 138.199.35.204
+  server: 138.199.35.210
   port: 9002
+  username: 'null'
+  password: 'null'
   tls: true
-  sni: 138.199.35.204
   skip-cert-verify: true
 - name: us|d4f7|puddincat07@Telegram
   obfs: salamander
@@ -344,6 +358,15 @@ proxies:
     headers:
       Host: faxf32gkfzoxqv.fx6hsv0.ccwu.cc
   udp: true
+- name: US - zhuhai.uk 05
+  type: http
+  server: 138.199.35.199
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 138.199.35.199
+  skip-cert-verify: true
 - name: 🇺🇸 美国 | USA 10
   server: 34.85.179.6
   port: 443
@@ -356,12 +379,20 @@ proxies:
   servername: www.cloudflare.com
   client-fingerprint: chrome
   network: tcp
-- name: US - zhuhai.uk
+- name: US - zhuhai.uk 06
+  type: http
+  server: 138.199.35.217
+  port: 9002
+  username: 'null'
+  password: None
+  tls: true
+  skip-cert-verify: true
+- name: US - zhuhai.uk 02
   type: http
   server: 138.199.35.215
   port: 9002
   username: 'null'
-  password: None
+  password: 'null'
   tls: true
   skip-cert-verify: true
 - name: 🇺🇸 美国 | USA 12
@@ -402,10 +433,10 @@ proxies:
   udp: true
 - name: DE - zhuhai.uk
   type: ss
-  server: 130.61.229.22
+  server: 130.61.181.110
   port: 59924
   cipher: 2022-blake3-chacha20-poly1305
-  password: wXzmFw7CAbcKLPRBcOReRJ7KiCYB5H0VRqDc2r6AZVU=
+  password: MuyetaNilfaNx1lrF+2BSzZJI2x4y4j5lOmnSH34/Ts=
 - name: xx|7c54|puddincat07@Telegram
   obfs: salamander
   obfs-password: 44f1c1e2f8b99e792ceed574627a1eb0
@@ -447,19 +478,19 @@ proxies:
   sni: labs.frkn.org
   tls: false
   type: hysteria2
-- name: xx|8727|puddincat07@Telegram
-  password: 1beb216e3f60aea9555dae60d219a5ca
-  port: 50160
-  server: 152-69-231-175.liao.kdns.fr
-  sni: 152-69-231-175.liao.kdns.fr
-  tls: false
-  type: hysteria2
 - name: ca|b7ee|puddincat07@Telegram
   password: H7mP2xY9kJ4nQ8wR5tF6vB3z
   port: 443
   server: 15.223.122.197
   skip-cert-verify: true
   sni: t.me
+  tls: false
+  type: hysteria2
+- name: xx|8727|puddincat07@Telegram
+  password: 1beb216e3f60aea9555dae60d219a5ca
+  port: 50160
+  server: 152-69-231-175.liao.kdns.fr
+  sni: 152-69-231-175.liao.kdns.fr
   tls: false
   type: hysteria2
 - name: AU - zhuhai.uk 02
@@ -476,6 +507,12 @@ proxies:
   reality-opts:
     public-key: fsdIMU2apN1C_NbkL7mHTsBKEfhwbDhgCRcB8ICf03E
     short-id: d725f0dd8cce210f
+- name: BE - zhuhai.uk 02
+  type: http
+  server: 146.70.176.242
+  port: 443
+  tls: true
+  skip-cert-verify: true
 - name: 🇪🇪 爱沙尼亚 | EST
   server: 5.101.114.44
   port: 2053
@@ -504,12 +541,14 @@ proxies:
     public-key: bnRIb3Er1i-K6NGGByCO9UbGfOvu43ZoiK7ulPd1SzU
   skip-cert-verify: false
   udp: true
-- name: NL - zhuhai.uk
-  type: ss
-  server: 158.101.222.3
-  port: 45819
-  cipher: 2022-blake3-chacha20-poly1305
-  password: aXCC+LogUNgffkN9eZuLOIdClpoHAWXvN8GxcmEkkis=
+- name: NL - zhuhai.uk 03
+  type: http
+  server: 84.17.47.125
+  port: 9002
+  username: 'null'
+  password: None
+  tls: true
+  skip-cert-verify: true
 - name: DE - zhuhai.uk 01
   type: vless
   server: de10.delivery-4f1c.com
@@ -524,6 +563,12 @@ proxies:
   reality-opts:
     public-key: z_Rn0Vvq1GB39RhN6v7DhdtD-kS0XZa_je0h-no_hWs
     short-id: 59eee550a1014198
+- name: NL - zhuhai.uk 02
+  type: ss
+  server: 152.70.58.170
+  port: 45819
+  cipher: 2022-blake3-chacha20-poly1305
+  password: E4PCvlt3ZX/Nwohf+ruGAohZ3BcnxbTx3ljdwXF9sYQ=
 - name: xx|c671|puddincat07@Telegram
   password: dongtaiwang.com
   port: 44356
@@ -532,19 +577,6 @@ proxies:
   sni: hy2.561891.xyz
   tls: false
   type: hysteria2
-- name: TR - zhuhai.uk
-  type: vless
-  server: 13.143.137.164
-  port: 9443
-  uuid: 953358cb-82ba-4296-960d-6d2ec3468f4c
-  flow: xtls-rprx-vision
-  tls: true
-  servername: plaincanvas.videoclothing.xyz
-  skip-cert-verify: true
-  client-fingerprint: chrome
-  reality-opts:
-    public-key: dZ0rhO_PL67-Ciwc6CHQgtde3a5EUUuReA7M-lRNCDQ
-    short-id: e336c9a786fae301
 - name: 🇦🇺AU澳大利亚丨yoyapai.com
   type: vless
   server: 163.8.195.241
@@ -586,18 +618,13 @@ proxies:
   client-fingerprint: chrome
   network: tcp
   udp: true
-- name: RO - zhuhai.uk
-  type: http
-  server: 193.176.84.34
-  port: 9002
-  tls: true
-  sni: www.bing.com
+- name: EE - zhuhai.uk
+  type: hysteria2
+  server: tishina-axe.dedyn.io
+  port: 8443
+  password: 319ed24b1c7203aa
+  sni: tishina-axe.dedyn.io
   skip-cert-verify: true
-- name: KR - zhuhai.uk
-  type: socks5
-  server: 121.169.46.116
-  port: 1090
-  username: T2c9PTo=
 - auth: H7mP2xY9kJ4nQ8wR5tF6vB3z
   name: xx|f149|puddincat07@Telegram
   password: H7mP2xY9kJ4nQ8wR5tF6vB3z
@@ -606,24 +633,19 @@ proxies:
   skip-cert-verify: true
   sni: vpn-us-006.fastervpn.world
   type: hysteria2
-- name: DE - zhuhai.uk 05
-  type: ss
-  server: 130.61.119.116
-  port: 59924
-  cipher: 2022-blake3-chacha20-poly1305
-  password: 8ilYOpgiXMq8BCHWqfd1G6/MWatxTQ0jVfSgvE18hqA=
-- name: 🇩🇪 德国 | DEU 9
-  server: 18.156.84.97
+- name: FI - zhuhai.uk
+  type: vless
+  server: finkafsb.finiki.lol
   port: 443
-  type: ss
-  cipher: aes-256-cfb
-  password: amazonskr05
-- name: DE - zhuhai.uk 03
-  type: ss
-  server: 130.61.226.114
-  port: 59924
-  cipher: 2022-blake3-chacha20-poly1305
-  password: wJJYYALkxTj4TAIgQiiuM0WLYLKjCe9UMc9BIN3peYg=
+  uuid: 4bdeee92-97e8-414d-bef6-ec1d5e2ab73b
+  flow: xtls-rprx-vision
+  tls: true
+  servername: finkafsb.finiki.lol
+  skip-cert-verify: true
+  client-fingerprint: chrome
+  reality-opts:
+    public-key: YBKHp6R7xp2Ss2kxbvDNMFPpRrf3oh1wQ2dVMukPHmA
+    short-id: d110331f200987ae
 - name: de|4e72|puddincat07@Telegram
   password: mkL3AfdSZIpTWRB9TcWPn9vywPGN89MRHg3ToRDj
   port: 443
@@ -646,6 +668,19 @@ proxies:
     short-id: c39cc7310a
   skip-cert-verify: false
   udp: true
+- name: ID - zhuhai.uk
+  type: http
+  server: voteshirleysew.club
+  port: 443
+  tls: true
+  sni: voteshirleysew.club
+  skip-cert-verify: true
+- name: BE - zhuhai.uk
+  type: http
+  server: 146.70.123.98
+  port: 443
+  tls: true
+  skip-cert-verify: true
 - name: ae|7312|puddincat07@Telegram
   password: Krab9Hyst2_Rk7pQ2xL
   port: 36723
@@ -670,24 +705,31 @@ proxies:
     host: denet1.17e1feeuzi.online
     mode: stream-one
   udp: true
+- name: FI - zhuhai.uk 02
+  type: vless
+  server: 196.196.206.38
+  port: 443
+  uuid: 4bdeee92-97e8-414d-bef6-ec1d5e2ab73b
+  flow: xtls-rprx-vision
+  tls: true
+  servername: finkafsb.finiki.lol
+  skip-cert-verify: true
+  client-fingerprint: firefox
+  reality-opts:
+    public-key: YBKHp6R7xp2Ss2kxbvDNMFPpRrf3oh1wQ2dVMukPHmA
+    short-id: d110331f200987ae
+- name: DE - zhuhai.uk 02
+  type: ss
+  server: 130.61.85.209
+  port: 59924
+  cipher: 2022-blake3-chacha20-poly1305
+  password: 20c8f4s56vvh6shlIdcwtlgvC1lPpQKZxvAbWv2ARe8=
 - name: IT - zhuhai.uk
   type: http
   server: 93.42.177.250
   port: 443
   tls: true
   skip-cert-verify: true
-- name: DE - zhuhai.uk 02
-  type: vless
-  server: gesmankos.sadiepinki.com
-  port: 443
-  uuid: c5694dc5-39fd-4a92-8430-3837baa522a3
-  flow: xtls-rprx-vision
-  tls: true
-  servername: gesmankos.sadiepinki.com
-  client-fingerprint: firefox
-  reality-opts:
-    public-key: rCkSHJ7goy7ZvSlau4LfXF-QLloOJMNeMxpeeQtwtVs
-    short-id: 4fa44664f6a566d3
 - name: 🇪🇸 西班牙 | ESP
   server: es.cache-4d8a.com
   port: 443
@@ -722,22 +764,24 @@ proxy-groups:
 - name: AUTO-FAST
   type: url-test
   proxies: &id001
-  - JP - zhuhai.uk 03
   - 🇭🇰 香港 | HKG 7
   - 🇭🇰 香港 | HKG 2
   - 🇭🇰 香港 | HKG 4
   - hk|0cf4|puddincat07@Telegram
   - 🇭🇰 香港 | HKG 3
+  - JP - zhuhai.uk 02
   - 🇯🇵 日本 | JPN 2
   - 🇭🇰 香港 | HKG 5
-  - SG - zhuhai.uk
   - 🇸🇬 新加坡 | SGP
+  - SG - zhuhai.uk
+  - HK - zhuhai.uk 03
   - JP - zhuhai.uk
-  - JP - zhuhai.uk 04
   - 🇯🇵 日本 | JPN
   - HK - zhuhai.uk 02
   - HK - zhuhai.uk
   - 🇭🇰 香港 | HKG 8
+  - US - zhuhai.uk 09
+  - US - zhuhai.uk 07
   - us|c3d4|puddincat07@Telegram
   - 🇺🇸 美国 | USA 9
   - US - zhuhai.uk 03
@@ -747,8 +791,10 @@ proxy-groups:
   - 🇺🇸 美国 | USA 3
   - 🇺🇸 美国 | USA 7
   - 🇺🇸 美国 | USA 5
+  - US - zhuhai.uk 05
   - 🇺🇸 美国 | USA 10
-  - US - zhuhai.uk
+  - US - zhuhai.uk 06
+  - US - zhuhai.uk 02
   - 🇺🇸 美国 | USA 12
   - ru|6cb0|puddincat07@Telegram
   - 🇬🇧 英国 | GBR 4
@@ -758,30 +804,31 @@ proxy-groups:
   - kr|1325|puddincat07@Telegram
   - xx|82a1|puddincat07@Telegram
   - xx|6aa1|puddincat07@Telegram
-  - xx|8727|puddincat07@Telegram
   - ca|b7ee|puddincat07@Telegram
+  - xx|8727|puddincat07@Telegram
   - AU - zhuhai.uk 02
+  - BE - zhuhai.uk 02
   - 🇪🇪 爱沙尼亚 | EST
   - 🇵🇱PL波兰丨yoyapai.com
-  - NL - zhuhai.uk
+  - NL - zhuhai.uk 03
   - DE - zhuhai.uk 01
+  - NL - zhuhai.uk 02
   - xx|c671|puddincat07@Telegram
-  - TR - zhuhai.uk
   - 🇦🇺AU澳大利亚丨yoyapai.com
   - 🇮🇹 意大利 | ITA
   - 🇨🇭 瑞士 | CHE
-  - RO - zhuhai.uk
-  - KR - zhuhai.uk
+  - EE - zhuhai.uk
   - xx|f149|puddincat07@Telegram
-  - DE - zhuhai.uk 05
-  - 🇩🇪 德国 | DEU 9
-  - DE - zhuhai.uk 03
+  - FI - zhuhai.uk
   - de|4e72|puddincat07@Telegram
   - 🇩🇪DE德国丨yoyapai.com_12
+  - ID - zhuhai.uk
+  - BE - zhuhai.uk
   - ae|7312|puddincat07@Telegram
   - 🇩🇪 德国 | DEU 12
-  - IT - zhuhai.uk
+  - FI - zhuhai.uk 02
   - DE - zhuhai.uk 02
+  - IT - zhuhai.uk
   - 🇪🇸 西班牙 | ESP
   - 🇩🇪 德国 | DEU 10
   url: http://www.gstatic.com/generate_204
@@ -795,6 +842,7 @@ proxy-groups:
   - hk|0cf4|puddincat07@Telegram
   - 🇭🇰 香港 | HKG 3
   - 🇭🇰 香港 | HKG 5
+  - HK - zhuhai.uk 03
   - HK - zhuhai.uk 02
   - HK - zhuhai.uk
   - 🇭🇰 香港 | HKG 8
@@ -803,16 +851,17 @@ proxy-groups:
 - name: JP-POOL
   type: url-test
   proxies:
-  - JP - zhuhai.uk 03
+  - JP - zhuhai.uk 02
   - 🇯🇵 日本 | JPN 2
   - JP - zhuhai.uk
-  - JP - zhuhai.uk 04
   - 🇯🇵 日本 | JPN
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: US-POOL
   type: url-test
   proxies:
+  - US - zhuhai.uk 09
+  - US - zhuhai.uk 07
   - us|c3d4|puddincat07@Telegram
   - 🇺🇸 美国 | USA 9
   - US - zhuhai.uk 03
@@ -822,8 +871,10 @@ proxy-groups:
   - 🇺🇸 美国 | USA 3
   - 🇺🇸 美国 | USA 7
   - 🇺🇸 美国 | USA 5
+  - US - zhuhai.uk 05
   - 🇺🇸 美国 | USA 10
-  - US - zhuhai.uk
+  - US - zhuhai.uk 06
+  - US - zhuhai.uk 02
   - 🇺🇸 美国 | USA 12
   url: http://www.gstatic.com/generate_204
   interval: 120
@@ -835,16 +886,15 @@ proxy-groups:
   - 🇭🇰 香港 | HKG 4
   - hk|0cf4|puddincat07@Telegram
   - 🇭🇰 香港 | HKG 3
-  - JP - zhuhai.uk 03
+  - JP - zhuhai.uk 02
   - 🇯🇵 日本 | JPN 2
   - JP - zhuhai.uk
-  - JP - zhuhai.uk 04
   - 🇯🇵 日本 | JPN
+  - US - zhuhai.uk 09
+  - US - zhuhai.uk 07
   - us|c3d4|puddincat07@Telegram
   - 🇺🇸 美国 | USA 9
   - US - zhuhai.uk 03
-  - us|d4f7|puddincat07@Telegram
-  - 🇺🇸 美国 | USA 8
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: FALLBACK
