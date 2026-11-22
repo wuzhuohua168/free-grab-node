@@ -1,8 +1,8 @@
-# free-grab-node v1.3.0 | 生成时间 2026-11-22T01:28Z
+# free-grab-node v1.3.0 | 生成时间 2026-11-22T08:28Z
 # 测速出口: 海外 GitHub Actions (美国) —— 仅验证「节点→海外」可达
 # 大陆可达性: 未经本地探针验证(本项目无国内云探针), 导入后请先在客户端测速筛选
 # 坏节点反馈: https://github.com/wuzhuohua168/free-grab-node/issues
-# 本轮收集 268 节点, 去重后 79 节点通过精测
+# 本轮收集 267 节点, 去重后 61 节点通过精测
 mixed-port: 7890
 allow-lan: true
 bind-address: '*'
@@ -66,66 +66,65 @@ dns:
     - +.youtube.com
     - +.googlevideo.com
 proxies:
-- name: JP - zhuhai.uk 02
-  type: http
-  server: jpgmo102-cdn-route.couldflare-cdn.com
-  port: 443
-  username: mrwdfNTD8M79LCukCieldrqZWqs=
-  password: exaxgqkKkd0TAMrCxeonWg==
-  tls: true
-  sni: jpgmo102-cdn-route.couldflare-cdn.com
-- name: 🇯🇵 日本 | JPN 2
-  server: jpk.wentibuxiaobuda.xyz
+- name: 🇭🇰 香港 | HKG 3
+  server: nb2hk.hikigo.com
   port: 443
   type: hysteria2
-  password: 36187bef1c708c82fd4099b9d70116ffd8c0f1f5bfd19cbb319eeb67899714f6
-  auth: 36187bef1c708c82fd4099b9d70116ffd8c0f1f5bfd19cbb319eeb67899714f6
-  sni: jpk.wentibuxiaobuda.xyz
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  auth: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  sni: nb2hk.hikigo.com
+  up: 100
+  down: 200
   skip-cert-verify: true
+  alpn:
+  - h3
+  obfs: salamander
+  obfs-password: o5qgnpl75wayhkn5
   udp: true
+- name: JP - zhuhai.uk 02
+  type: socks5
+  server: 101.36.104.239
+  port: 10808
 - name: SG - zhuhai.uk
   type: socks5
   server: 66.80.2.252
   port: 62000
   username: usereb7d
   password: c0a34a
-- type: vless
-  name: 🇯🇵JP日本丨yoyapai.com (2)
-  server: 38.47.96.220
-  port: 11424
-  uuid: 1d16c6e0-1bbe-435b-b661-90043fee999c
+- name: 🇯🇵 日本 | JPN 4
+  server: dg3rb.ianai.it.com
+  port: 443
+  type: hysteria2
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  auth: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  sni: dg3rb.ianai.it.com
+  up: 100
+  down: 200
+  skip-cert-verify: true
+  alpn:
+  - h3
+  obfs: salamander
+  obfs-password: e3ymhs6gbzptjysj
   udp: true
-  tls: true
-  servername: notls.lukongtou.eu.org
-  sni: notls.lukongtou.eu.org
-  skip-cert-verify: false
-  network: ws
-  ws-opts:
-    path: Telegram-WangCai2🇨🇳
-    headers:
-      Host: notls.lukongtou.eu.org
 - name: 🇭🇰 香港 | HKG
-  server: 8.217.1.203
-  port: 8443
-  type: vless
-  uuid: 8b17beac-b143-447d-aa68-14cbb121a602
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: 74P0QFvaK6B13rHsxR_t0lqRlg4YLuORD4VaHr5Jd38
-    short-id: 0bf55f64
-  servername: www.apple.com
-  client-fingerprint: chrome
-  network: tcp
+  server: 66hk.mateflora.com
+  port: 443
+  type: hysteria2
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  auth: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  sni: 66hk.mateflora.com
+  up: 100
+  down: 200
+  skip-cert-verify: true
+  alpn:
+  - h3
+  obfs: salamander
+  obfs-password: aemx2gndpgrt1qau
   udp: true
 - name: JP - zhuhai.uk
-  type: http
-  server: fan.571589.xyz
-  port: 443
-  username: bnVsbDpudWxs
-  tls: true
-  sni: fan.571589.xyz
-  skip-cert-verify: true
+  type: socks5
+  server: 101.36.104.46
+  port: 10808
 - name: sg|9317|puddincat07@Telegram
   password: '8888'
   port: 1080
@@ -140,12 +139,13 @@ proxies:
   tls: true
   skip-cert-verify: true
 - name: 🇯🇵 日本 | JPN
-  server: 156.246.93.237
-  port: 17443
+  server: dg4.ianai.it.com
+  port: 443
   type: trojan
-  password: LDSLDq9XlM4-92pvTPOUuklMb99BLOCrdyejsupEca4
-  sni: jpk.wentibuxiaobuda.xyz
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  sni: dg4.ianai.it.com
   skip-cert-verify: true
+  udp: true
 - name: HK - zhuhai.uk 02
   type: http
   server: fan.240104.xyz
@@ -154,94 +154,29 @@ proxies:
   sni: fan.240104.xyz
   skip-cert-verify: true
 - name: HK - zhuhai.uk
-  type: socks5
-  server: 47.242.19.215
-  port: 8899
-  username: admin
-  password: admin
+  type: http
+  server: 119.28.24.235
+  port: 3128
+  tls: true
+  skip-cert-verify: true
 - name: US - zhuhai.uk 07
   type: http
-  server: 138.199.35.211
-  port: 9002
-  username: 'null'
-  password: None
-  tls: true
-  skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 9
-  server: tachu37.top
+  server: 38.28.193.188
   port: 443
-  type: vless
-  uuid: 65c21703-ae89-4eed-ae87-8bec8a4c000c
+  username: 'null'
+  password: 'null'
   tls: true
-  alpn:
-  - http/1.1
-  servername: tachu37.top
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /js
-    headers:
-      Host: tachu37.top
-  udp: true
+  sni: 38.28.193.188
+  skip-cert-verify: true
 - name: US - zhuhai.uk 03
   type: http
-  server: 129.153.93.183
+  server: 107.151.238.27
   port: 443
+  username: testuser1
+  password: e4b72b531a2d10900519
   tls: true
-  skip-cert-verify: true
+  sni: 6b97ee1b.acsnet.co
 - name: 🇺🇸 美国 | USA 8
-  server: 5.34.178.120
-  port: 443
-  type: vless
-  uuid: 23b848b7-93e5-4d96-b36d-ed704912e5b7
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: 4RaNuv9yehmcfpdzvRxCWWzEWERWzZSIHqcgg3l35Cw
-    short-id: e16bbf1a5bee2321
-  servername: www.cloudflare.com
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: us|2abc|puddincat07@Telegram
-  password: test123
-  port: 1080
-  server: 104.168.249.36
-  type: socks5
-  username: test123
-- name: 🇺🇸 美国 | USA 6
-  server: 179.253.80.175
-  port: 4443
-  type: vless
-  uuid: a35c508f-4d5d-4531-842e-6e9d43c762c0
-  tls: true
-  servername: swo2.nexfile.net
-  client-fingerprint: firefox
-  network: xhttp
-  xhttp-opts:
-    path: /api/v1/sync/
-  udp: true
-- name: 🇺🇸 美国 | USA 7
-  server: sparkling-gadabout.quick-cdn.net
-  port: 443
-  type: vless
-  uuid: bde4fc77-a93a-49c0-bf0e-de3471cd52bd
-  tls: true
-  servername: sparkling-gadabout.quick-cdn.net
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /ws
-    headers:
-      Host: sparkling-gadabout.quick-cdn.net
-  udp: true
-- name: US - zhuhai.uk 05
-  type: http
-  server: 172.64.68.89
-  port: 443
-  tls: true
-  skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 3
   server: swo2.nexfile.net
   port: 4443
   type: vless
@@ -255,33 +190,45 @@ proxies:
     host: swo2.nexfile.net
     mode: auto
   udp: true
+- name: us|2abc|puddincat07@Telegram
+  password: test123
+  port: 1080
+  server: 104.168.249.36
+  type: socks5
+  username: test123
+- name: US - zhuhai.uk 08
+  type: http
+  server: 138.199.35.216
+  port: 9002
+  username: 'null'
+  password: 'null'
+  tls: true
+  sni: 138.199.35.216
+  skip-cert-verify: true
+- name: 🇺🇸 美国 | USA 6
+  server: 48.102.173.125
+  port: 444
+  type: vless
+  uuid: ef5a57c7-84d5-4f86-b99c-875a16da485f
+  tls: true
+  servername: neplay603.gangtype.com
+  client-fingerprint: chrome
+  network: ws
+  ws-opts:
+    path: /stream/updates/a66d7902
+    headers:
+      Host: neplay603.gangtype.com
+  udp: true
 - name: US - zhuhai.uk 04
   type: http
-  server: 38.95.111.226
-  port: 9443
+  server: 138.199.35.200
+  port: 9002
+  username: 'null'
+  password: 'null'
   tls: true
+  sni: 138.199.35.200
   skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 4
-  server: 217.69.174.175
-  port: 443
-  type: vless
-  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
-  tls: true
-  reality-opts:
-    public-key: UoS8qZ74hP_ECcncCz55lzvlcVss3R7VA0WYZE0YQCY
-    short-id: ba2a3dce62b99092
-  servername: 04535dt.us8.h1clayd.click
-  client-fingerprint: firefox
-  network: tcp
-  udp: true
-- name: 🇺🇸 美国 | USA 5
-  server: 48.103.218.77
-  port: 18443
-  type: ss
-  cipher: aes-256-gcm
-  password: 5mKjXAGrliIAlYwWDeFzkCEMIgQdFQLe
-  udp: true
-- name: 🇺🇸 美国 | USA
+- name: 🇺🇸 美国 | USA 3
   server: 13.141.51.2
   port: 443
   type: vless
@@ -294,92 +241,92 @@ proxies:
   client-fingerprint: firefox
   network: tcp
   udp: true
-- name: US - zhuhai.uk 06
+- name: US - zhuhai.uk 05
   type: http
-  server: 24.142.229.178
-  port: 8090
+  server: 47.90.206.169
+  port: 7615
   tls: true
+  sni: 47.90.206.169
   skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 10
-  server: media.embrofree.org
-  port: 443
+- name: 🇺🇸 美国 | USA 5
+  server: a3dgus.supertoolify.com
+  port: 40055
   type: hysteria2
-  password: 713142c9-ad09-4894-b35c-645423f3f6c9
-  auth: 713142c9-ad09-4894-b35c-645423f3f6c9
-  sni: media.embrofree.org
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  auth: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  sni: psstatic.cdn.bcebos.com
+  up: 100
+  down: 200
   skip-cert-verify: true
-- name: US - zhuhai.uk
+  alpn:
+  - h3
+  obfs: salamander
+  obfs-password: re61ep4ancwplwh8
+  udp: true
+- name: US - zhuhai.uk 13
   type: http
-  server: 149.34.248.65
-  port: 443
+  server: 45.145.73.240
+  port: 8443
   tls: true
+  sni: 45.145.73.240
   skip-cert-verify: true
-- name: US - zhuhai.uk 02
+- name: 🇺🇸 美国 | USA
+  server: 961ec0g.nl13.h1clayd.click
+  port: 443
+  type: vless
+  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
+  tls: true
+  reality-opts:
+    public-key: xn7KVKS5MOnsFrYrEeRS04JssBCOxh12rxegaDFyGkA
+    short-id: 6d289ff0f47c0aac
+  servername: 961ec0g.nl13.h1clayd.click
+  client-fingerprint: chrome
+  network: grpc
+  grpc-opts:
+    grpc-mode: gun
+    grpc-service-name: 7d5abcd7d8a1
+  udp: true
+- name: US - zhuhai.uk 06
   type: http
   server: 138.199.35.204
   port: 9002
   tls: true
+  sni: 138.199.35.204
   skip-cert-verify: true
-- name: 🇺🇸 美国 | USA 2
-  server: 162.35.101.177
+- name: US - zhuhai.uk
+  type: http
+  server: 138.199.35.200
+  port: 9002
+  tls: true
+  skip-cert-verify: true
+- name: US - zhuhai.uk 02
+  type: http
+  server: 38.247.141.135
   port: 443
-  type: vless
-  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
+  username: 'null'
+  password: 'null'
   tls: true
-  reality-opts:
-    public-key: cO3wYHISTeorXcM8ffaDCDdqZ-olBQL-GyZqb-W7rTk
-    short-id: bd8f712209a9c283
-  servername: 0592efg.us8.h1clayd.click
-  client-fingerprint: edge
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: 99f2107b03f8
-  udp: true
-- name: 🇳🇱 荷兰 | NLD 7
-  server: 196.196.148.63
+  skip-cert-verify: true
+- name: US - zhuhai.uk 12
+  type: http
+  server: 23.133.176.14
   port: 443
-  type: vless
-  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
   tls: true
-  reality-opts:
-    public-key: PD8Jdlg3xB9QY--jwQjp8PFPzCS8-Oryw6-HWBcHMFU
-    short-id: d3bd772514c87d28
-  servername: 717252g.nl8.h1clayd.click
-  client-fingerprint: firefox
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: 204adda7e3da
-  udp: true
-- name: 🇷🇺 俄罗斯 | RUS 6
-  server: 168.113.253.178
+  sni: 23.133.176.14
+  skip-cert-verify: true
+- name: US - zhuhai.uk 10
+  type: http
+  server: 38.28.193.188
   port: 443
-  type: vless
-  uuid: d6d40100-9442-0001-b5b9-6d259318c421
   tls: true
-  servername: uzndiuvzvqqljdyhzs.fcloudservices.site
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: 🇩🇪 德国 | DEU 2
-  server: sv.fn.clients.fimrel.ir
-  port: 29086
-  type: vless
-  uuid: 748fd766-274b-4026-8bfe-034ed4ffe58f
-  tls: true
-  flow: xtls-rprx-vision
-  encryption: mlkem768x25519plus.native.0rtt.9ifdcMCsJ-bMvc9ealWuadeq1_iASTHy8hetUix-nTM
-  servername: sv.fn.clients.fimrel.ir
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: BR - zhuhai.uk
+  sni: 38.28.193.188
+  skip-cert-verify: true
+- name: VN - zhuhai.uk
   type: socks5
-  server: 191.7.129.186
+  server: 221.133.22.195
   port: 62000
-  username: uf3on6k8
-  password: anlxq4mb
+  username: KUs4xRXd
+  password: 480w0Yy4
 - name: 🇷🇺 俄罗斯 | RUS 4
   server: 201.24.116.192
   port: 443
@@ -393,52 +340,29 @@ proxies:
     grpc-mode: gun
     grpc-service-name: mobile.api.Event
   udp: true
-- name: 🇳🇱 荷兰 | NLD 8
-  server: 80cb66x.nl13.h1clayd.click
-  port: 443
-  type: vless
-  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
-  tls: true
-  reality-opts:
-    public-key: jhVdP7NFUaEXGfrmOqJlMCHTvqn3fymbzPfPT6NO4i0
-    short-id: f72d4a2c7cbbacb1
-  servername: 80cb66x.nl13.h1clayd.click
-  client-fingerprint: chrome
-  network: xhttp
-  xhttp-opts:
-    path: /d610f026b146
-    host: 80cb66x.nl13.h1clayd.click
-    mode: auto
-  udp: true
-- name: DE - zhuhai.uk
-  type: http
-  server: 158.173.154.1
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  skip-cert-verify: true
-- name: 🇨🇳 CN_87
-  server: sclass-01.catcat321.com
-  port: 20103
-  type: trojan
-  password: d7563108-615c-4338-a7bd-77f359869a4a
-  sni: hk.catxstar.com
-  skip-cert-verify: true
-  udp: true
 - name: 🇩🇪 德国 | DEU 7
-  server: 189.24.115.30
-  port: 443
-  type: vless
-  uuid: 3a1c6827-72a1-4d1c-9413-44109ff815f4
-  tls: true
-  reality-opts:
-    public-key: UT9tFQOdy54SeW_tg-XQN3QkGYoWUpO_88XFXijkrXc
-    short-id: 2da72ce6
-  servername: navi.bankrate.com
-  client-fingerprint: chrome
-  network: tcp
+  server: a3dee.supertoolify.com
+  port: 4430
+  type: hysteria2
+  password: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  auth: 57beeeb0-03fc-4fc9-94da-7604488a7134
+  sni: psstatic.cdn.bcebos.com
+  up: 100
+  down: 200
+  skip-cert-verify: true
+  alpn:
+  - h3
+  obfs: salamander
+  obfs-password: off3io88xwyc76g8
+  udp: true
 - name: 🇮🇹 意大利 | ITA 2
+  server: 202.50.253.36
+  port: 19999
+  type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  udp: true
+- name: 🇮🇹 意大利 | ITA 4
   server: 202.50.253.54
   port: 19999
   type: ss
@@ -446,93 +370,54 @@ proxies:
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   udp: true
 - name: 🇷🇺 俄罗斯 | RUS 2
-  server: 201.51.12.98
+  server: 168.113.253.178
   port: 443
   type: vless
-  uuid: 38308ff1-5aa9-494f-a25a-0f2870d56b3e
+  uuid: d6d40100-9442-0001-b5b9-6d259318c421
   tls: true
-  servername: vps3.nemnogogo.com
-  client-fingerprint: firefox
-  network: grpc
-  grpc-opts:
-    grpc-mode: gun
-    grpc-service-name: mobile.api.Event
+  servername: uzndiuvzvqqljdyhzs.fcloudservices.site
+  client-fingerprint: chrome
+  network: tcp
   udp: true
-- name: 🇮🇹 意大利 | ITA 4
-  server: 202.50.253.45
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  udp: true
-- name: 🇳🇱 荷兰 | NLD 10
-  server: 91.186.197.50
-  port: 8443
+- name: 🇸🇪 瑞典 | SWE 3
+  server: 0ef47cx.se4.h1clayd.click
+  port: 443
   type: vless
-  uuid: dcf42340-4143-4a52-980d-171afd3efa5c
+  uuid: f15a2e25-6859-4bcc-b4c4-a14bb8ae0fbb
   tls: true
-  flow: xtls-rprx-vision
-  encryption: mlkem768x25519plus.native.0rtt.B8kapwAcAo7moBioRHJ5wg-TFFKbjlXCL3FFCHfOjEA
   reality-opts:
-    public-key: T4N8v2chhy4ZJrt2ENLMmwnQU7h7omZEFRhZhKWR9SA
-    short-id: 7ac0b7f44ed17b33
-  servername: origin.media.cdn.videoclothing.xyz
+    public-key: LZhuBYUqlo8epvzFF3tOPMZ_vjZPN1sraOYy2CKtcz4
+    short-id: 356cc54d885a4036
+  servername: 0ef47cx.se4.h1clayd.click
   client-fingerprint: chrome
   network: xhttp
   xhttp-opts:
-    path: /codex-xhttp8443-20261027-s1265796/NL199/xhttp
-    host: origin.media.cdn.videoclothing.xyz
+    path: /444de120fb2d
+    host: 0ef47cx.se4.h1clayd.click
     mode: auto
   udp: true
-- name: 🇳🇱 荷兰 | NLD 4
-  server: 201.34.142.108
+- name: FR - zhuhai.uk
+  type: http
+  server: 84.235.228.156
   port: 443
-  type: vless
-  uuid: 4777d90d-265b-4927-a0d1-63f36ed1421c
+  username: 'null'
+  password: 'null'
   tls: true
-  client-fingerprint: chrome
-  network: xhttp
-  xhttp-opts:
-    path: /assets/nlrelay01/
-    mode: auto
-  udp: true
+  skip-cert-verify: true
+- name: DK - zhuhai.uk
+  type: http
+  server: 185.245.84.50
+  port: 9443
+  tls: true
+  skip-cert-verify: true
+- name: RU - zhuhai.uk
+  type: http
+  server: 87.242.85.187
+  port: 8443
+  tls: true
+  sni: 87.242.85.187
+  skip-cert-verify: true
 - name: 🇷🇺 俄罗斯 | RUS 3
-  server: 168.113.253.178
-  port: 443
-  type: vless
-  uuid: eb88bb1a-7bf0-0001-b9cd-4f97c89f0e9b
-  tls: true
-  servername: uzndiuvzvqqljdyhzs.fcloudservices.site
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: 🇷🇺 俄罗斯 | RUS 7
-  server: 168.113.253.178
-  port: 443
-  type: vless
-  uuid: 608172ed-68e4-0001-85dc-f92c25d0eb92
-  tls: true
-  servername: uzndiuvzvqqljdyhzs.fcloudservices.site
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: 🇮🇹 意大利 | ITA 6
-  server: 202.50.253.27
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  udp: true
-- type: ss
-  name: 🇮🇹IT意大利丨yoyapai.com (12)
-  server: 202.50.253.99
-  port: 19999
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  cipher: aes-256-gcm
-  udp: true
-  tls: false
-  skip-cert-verify: false
-- name: 🇷🇺 俄罗斯 | RUS
   server: vps3.nemnogogo.com
   port: 443
   type: vless
@@ -547,149 +432,59 @@ proxies:
     grpc-mode: gun
     grpc-service-name: mobile.api.Event
   udp: true
+- name: 🇹🇼 🇨🇳 台湾 | TWN
+  server: 102.134.35.197
+  port: 443
+  type: vless
+  uuid: 122e2b61-6b68-4872-a1c8-3db9a0d554e0
+  tls: true
+  flow: xtls-rprx-vision
+  reality-opts:
+    public-key: qOGwfAG_taSX01wGv1eq8cLkPHDSa-RNvp9iAw-8SDs
+    short-id: 4402f260a449cce9
+  servername: www.ebay.com
+  client-fingerprint: chrome
+  network: tcp
+  udp: true
 - type: ss
-  name: ❓未知丨yoyapai.com (9)
-  server: 202.50.253.36
+  name: 🇮🇹IT意大利丨yoyapai.com (6)
+  server: 202.50.253.90
   port: 19999
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   cipher: aes-256-gcm
   udp: true
   tls: false
   skip-cert-verify: false
-- name: AL - zhuhai.uk
-  type: http
-  server: 91.92.250.33
-  port: 443
-  tls: true
-  skip-cert-verify: true
-- name: TH - zhuhai.uk 03
-  type: socks5
-  server: 109.66.136.194
-  port: 62000
-  username: r3ZzP8WW
-  password: zdnivBaI
-- name: NL - zhuhai.uk 03
-  type: http
-  server: 89.150.35.94
-  port: 443
-  tls: true
-  sni: 89.150.35.94
-  skip-cert-verify: true
-- name: NL - zhuhai.uk
-  type: http
-  server: 51.159.225.196
-  port: 23856
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 51.159.225.196
-  skip-cert-verify: true
-- name: DE - zhuhai.uk 01
-  type: vless
-  server: 176.98.176.60
-  port: 443
-  uuid: 7ad63b26-bf70-4872-8fab-ebaf73a1e19d
-  udp: true
-  network: tcp
-  flow: xtls-rprx-vision
-  tls: true
-  servername: mosaic.topp-con.xyz
-  client-fingerprint: firefox
-- name: NL - zhuhai.uk 02
-  type: http
-  server: 84.17.47.125
-  port: 9002
-  tls: true
-  sni: 84.17.47.125
-  skip-cert-verify: true
-- name: 🇩🇪 德国 | DEU 6
-  server: 13.143.187.220
-  port: 443
-  type: vless
-  uuid: 66c78912-4e2d-41dc-8742-aaae2590804e
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: eDzVz3bxkv3IoN3BUCa_aA-RicoeG7ACylYSnmS2Pgg
-  servername: fi-s1.kadrhub.tech
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: 🇮🇹 意大利 | ITA
-  server: 202.50.253.90
-  port: 19999
-  type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
-  udp: true
-- name: 🇷🇺 俄罗斯 | RUS 5
+- name: 🇷🇺 俄罗斯 | RUS
   server: 168.113.253.178
   port: 443
   type: vless
-  uuid: 58708e38-dd5a-0001-902d-93621ee2bd83
+  uuid: eb88bb1a-7bf0-0001-b9cd-4f97c89f0e9b
   tls: true
   servername: uzndiuvzvqqljdyhzs.fcloudservices.site
   client-fingerprint: chrome
   network: tcp
   udp: true
-- name: 🇮🇹 意大利 | ITA 5
-  server: 202.50.253.72
+- type: ss
+  name: 🇮🇹IT意大利丨yoyapai.com
+  server: 202.50.253.45
   port: 19999
-  type: ss
-  cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
   udp: true
-- name: KR - zhuhai.uk
-  type: http
-  server: 152.69.230.221
-  port: 443
-  tls: true
-  skip-cert-verify: true
-- name: TH - zhuhai.uk 02
-  type: socks5
-  server: 168.222.8.66
-  port: 42000
-  username: JPjarpW3
-  password: ao3W5ZML
-- name: 🇬🇧 英国 | GBR 2
-  server: 136.148.83.69
-  port: 443
-  type: vless
-  uuid: 7dff1be7-b930-0001-a8ad-dc7850168215
-  tls: true
-  servername: szqbx-ru-77dc.my-fade.cloud
-  client-fingerprint: chrome
-  network: tcp
-  udp: true
-- name: 🇳🇱 荷兰 | NLD 6
-  server: 66.90.91.122
-  port: 443
-  type: vless
-  uuid: e9958027-03be-4eb5-bcec-70415b2e4844
-  tls: true
-  alpn:
-  - h2
-  servername: 6b014610-e9958027.ferrin.uk
-  client-fingerprint: firefox
-  network: xhttp
-  xhttp-opts:
-    path: /
-    mode: auto
-  udp: true
-- name: NL - zhuhai.uk 04
-  type: http
-  server: 84.17.47.146
-  port: 9002
-  tls: true
-  sni: 84.17.47.146
-  skip-cert-verify: true
-- name: 🇩🇪 德国 | DEU
-  server: 168.119.190.106
-  port: 443
-  type: vless
-  uuid: 45f7bbfe-7d9c-49e1-81f3-154c0cd40121
   tls: false
-  encryption: mlkem768x25519plus.random.0rtt.swY_aKEuuHUHKO0BHVV2uot-UFbtrXpLWr7g8uZk0xk
+  skip-cert-verify: false
+- name: 🇹🇷 土耳其 | TUR
+  server: iran.crackerbinam.org
+  port: 54005
+  type: vless
+  uuid: b87e0fe3-2eaa-4714-b717-ae3204fc1846
+  tls: true
+  reality-opts:
+    public-key: k62XkGNgUzt6z6NjQrM-zjpuUei3G62_AAIzlgxHaEA
+    short-id: ed69a523b5ab3e
+  servername: www.cloudflare.com
+  client-fingerprint: chrome
   network: http
   http-opts:
     method: GET
@@ -697,56 +492,96 @@ proxies:
     - /
     headers:
       Host:
-      - www.upwork.com
+      - www.cloudflare.com
   udp: true
-- name: 🇪🇸 西班牙 | ESP 2
-  server: 196.199.122.2
+- name: 🇮🇹 意大利 | ITA
+  server: 202.50.253.99
+  port: 19999
+  type: ss
+  cipher: aes-256-gcm
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  udp: true
+- name: 🇩🇪 德国 | DEU 11
+  server: 193.160.208.240
   port: 443
   type: vless
-  uuid: 4201786b-d99b-4147-a5f0-20d47acddb81
+  uuid: 4777d90d-265b-4927-a0d1-63f36ed1421c
+  tls: true
+  servername: 193.160.208.240
+  client-fingerprint: firefox
+  network: xhttp
+  xhttp-opts:
+    path: /assets/twru01/
+    mode: auto
+  udp: true
+- name: 🇹🇼 🇨🇳 台湾 | TWN 2
+  server: hy3.kipfel.dev
+  port: 33000
+  type: hysteria2
+  password: 30610baf-4645-4c7b-9a22-0d0a0a79eab5
+  auth: 30610baf-4645-4c7b-9a22-0d0a0a79eab5
+  sni: hy3.kipfel.dev
+  skip-cert-verify: true
+  ports: 33000-39000
+  udp: true
+- name: 🇵🇭 菲律宾 | PHL
+  server: 47.80.76.105
+  port: 443
+  type: vless
+  uuid: ecdcc5d3-644a-4606-9e9e-130315da68cd
   tls: true
   flow: xtls-rprx-vision
   reality-opts:
-    public-key: ZSmetD4e9QG5CiXhniHg5HJB68L4kwbgAkJmMHtVwEE
-    short-id: 42426c882c5fcd41
-  servername: 7aa271t.es1.h1clayd.click
+    public-key: T7_XLYoPP1_kxIaOov9SovRMk-P1mS-FRhdWueHxaR0
+    short-id: 58aa532948cab4a4
+  servername: www.amazon.com
   client-fingerprint: chrome
   network: tcp
   udp: true
-- name: TH - zhuhai.uk
+- name: EC - zhuhai.uk
+  type: http
+  server: 38.165.231.71
+  port: 9443
+  tls: true
+  sni: 38.165.231.71
+  skip-cert-verify: true
+- name: KR - zhuhai.uk
   type: socks5
-  server: 87.84.49.140
-  port: 62000
-  username: ks878449260d
-  password: YlRoWvE0dL_cUqS94wPeKnA4
-- name: 🇳🇱 荷兰 | NLD 3
-  server: f0d7aft.nl13.h1clayd.click
+  server: 121.169.46.116
+  port: 1090
+  username: VDJjbE0wUWxNMFE2Og==
+- type: ss
+  name: ❓未知丨yoyapai.com (3)
+  server: 202.50.253.72
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: false
+- name: 🇩🇪 德国 | DEU 4
+  server: 45.86.158.53
   port: 443
   type: vless
-  uuid: cda0862a-0f87-4be9-8ed8-1d0c9e382839
+  uuid: 082ff568-e0f1-42af-ad7c-2c46adde1273
   tls: true
+  flow: xtls-rprx-vision
   reality-opts:
-    public-key: kkCGiCQCKnkozJR1KKCRNtmdBECmThCgI9VSv7iDcWI
-    short-id: 8956c57cb4c4f8d2
-  servername: f0d7aft.nl13.h1clayd.click
-  client-fingerprint: chrome
+    public-key: -ZN1kT3JlPFxu1E906JRqLAGoQQucSmL6xPiuAyasTk
+    short-id: 597e1c279d224774
+  servername: 4c980ft.fi15.h1clayd.click
+  client-fingerprint: firefox
   network: tcp
   udp: true
-- name: LT - zhuhai.uk
-  type: http
-  server: 89.124.11.9
-  port: 443
-  tls: true
-  skip-cert-verify: true
-- name: NL - zhuhai.uk 05
-  type: http
-  server: 84.17.47.146
-  port: 9002
-  username: 'null'
-  password: 'null'
-  tls: true
-  sni: 84.17.47.146
-  skip-cert-verify: true
+- type: ss
+  name: ❓未知丨yoyapai.com (7)
+  server: 202.50.253.81
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
+  udp: true
+  tls: false
+  skip-cert-verify: false
 - type: ss
   name: ❓未知丨yoyapai.com (6)
   server: 202.50.253.63
@@ -756,46 +591,31 @@ proxies:
   udp: true
   tls: false
   skip-cert-verify: false
-- name: 🇳🇱 荷兰 | NLD 9
-  server: 48.102.173.125
-  port: 444
-  type: vless
-  uuid: ef5a57c7-84d5-4f86-b99c-875a16da485f
-  tls: true
-  servername: neplay603.gangtype.com
-  client-fingerprint: chrome
-  network: ws
-  ws-opts:
-    path: /stream/updates/a66d7902
-    headers:
-      Host: neplay603.gangtype.com
+- type: ss
+  name: ❓未知丨yoyapai.com (2)
+  server: 202.50.253.18
+  port: 19999
+  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  cipher: aes-256-gcm
   udp: true
-- name: 🇻🇳 越南 | VNM
-  server: 38.60.230.151
-  port: 443
-  type: vless
-  uuid: 3a1c6827-72a1-4d1c-9413-44109ff815f4
-  tls: true
-  packet-encoding: xudp
-  reality-opts:
-    public-key: UT9tFQOdy54SeW_tg-XQN3QkGYoWUpO_88XFXijkrXc
-    short-id: 2da72ce6
-  servername: navi.bankrate.com
-  client-fingerprint: chrome
-  network: tcp
-- name: 🇬🇧 英国 | GBR
-  server: 136.176.68.34
-  port: 443
-  type: vless
-  uuid: dbf3f074-3b18-43f3-b82a-debd8c879c69
-  tls: true
-  flow: xtls-rprx-vision
-  reality-opts:
-    public-key: Jcm0TjP_kw-KmJoiG5EGyY5sQ9RGeqlX9Ajd3ZCnSAo
-    short-id: a6040129ad7f4b74
-  servername: www.apple.com
-  client-fingerprint: chrome
-  network: tcp
+  tls: false
+  skip-cert-verify: false
+- name: ID - zhuhai.uk
+  type: socks5
+  server: 203.84.138.59
+  port: 62000
+  username: 9tcjLp2W
+  password: RRWtX6XP
+- cipher: chacha20-ietf
+  name: xx|0291|puddincat07@Telegram
+  obfs: tls1.2_ticket_auth
+  obfsparam: ''
+  password: dongtaiwang.com
+  port: 33336
+  protocol: auth_chain_a
+  protocolparam: ''
+  server: ssr2.762988.xyz
+  type: ssr
   udp: true
 - cipher: chacha20-ietf
   name: nl|3eaa|puddincat07@Telegram
@@ -808,44 +628,29 @@ proxies:
   server: 109.104.153.43
   type: ssr
 - name: 🇮🇹 意大利 | ITA 3
-  server: 202.50.253.81
+  server: 202.50.253.27
   port: 19999
   type: ss
   cipher: aes-256-gcm
   password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
   udp: true
-- name: 🇮🇹 意大利 | ITA 7
-  server: 202.50.253.18
-  port: 19999
+- name: DE - zhuhai.uk 02
   type: ss
-  cipher: aes-256-gcm
-  password: ZRpgaBeGxtENIXgvhpkZBKz9GnWRS2dYcx9O+a2iwN4=
+  server: 47.254.167.157
+  port: 443
+  cipher: 2022-blake3-chacha20-poly1305
+  password: 8yO3ANWefuuGs1lRKXECQA1FEhxlWFV2ppQMcBaZo5Y=
   udp: true
-- name: 🇳🇱 荷兰 | NLD 5
-  server: 48.102.173.24
-  port: 444
-  type: vless
-  uuid: ef5a57c7-84d5-4f86-b99c-875a16da485f
-  tls: true
-  servername: neplay603.gangtype.com
-  client-fingerprint: firefox
-  network: ws
-  ws-opts:
-    path: /stream/updates/a66d7902
-    headers:
-      Host: neplay603.gangtype.com
-  udp: true
-- name: 🇪🇸 西班牙 | ESP
-  server: 196.196.149.80
+- name: 🇩🇪 德国 | DEU 10
+  server: 13.143.187.220
   port: 443
   type: vless
-  uuid: 4201786b-d99b-4147-a5f0-20d47acddb81
+  uuid: 66c78912-4e2d-41dc-8742-aaae2590804e
   tls: true
   flow: xtls-rprx-vision
   reality-opts:
-    public-key: ZSmetD4e9QG5CiXhniHg5HJB68L4kwbgAkJmMHtVwEE
-    short-id: 42426c882c5fcd41
-  servername: 7aa271t.es1.h1clayd.click
+    public-key: eDzVz3bxkv3IoN3BUCa_aA-RicoeG7ACylYSnmS2Pgg
+  servername: fi-s1.kadrhub.tech
   client-fingerprint: chrome
   network: tcp
   udp: true
@@ -853,10 +658,10 @@ proxy-groups:
 - name: AUTO-FAST
   type: url-test
   proxies: &id001
+  - 🇭🇰 香港 | HKG 3
   - JP - zhuhai.uk 02
-  - 🇯🇵 日本 | JPN 2
   - SG - zhuhai.uk
-  - 🇯🇵JP日本丨yoyapai.com (2)
+  - 🇯🇵 日本 | JPN 4
   - 🇭🇰 香港 | HKG
   - JP - zhuhai.uk
   - sg|9317|puddincat07@Telegram
@@ -865,78 +670,61 @@ proxy-groups:
   - HK - zhuhai.uk 02
   - HK - zhuhai.uk
   - US - zhuhai.uk 07
-  - 🇺🇸 美国 | USA 9
   - US - zhuhai.uk 03
   - 🇺🇸 美国 | USA 8
   - us|2abc|puddincat07@Telegram
+  - US - zhuhai.uk 08
   - 🇺🇸 美国 | USA 6
-  - 🇺🇸 美国 | USA 7
-  - US - zhuhai.uk 05
-  - 🇺🇸 美国 | USA 3
   - US - zhuhai.uk 04
-  - 🇺🇸 美国 | USA 4
+  - 🇺🇸 美国 | USA 3
+  - US - zhuhai.uk 05
   - 🇺🇸 美国 | USA 5
+  - US - zhuhai.uk 13
   - 🇺🇸 美国 | USA
   - US - zhuhai.uk 06
-  - 🇺🇸 美国 | USA 10
   - US - zhuhai.uk
   - US - zhuhai.uk 02
-  - 🇺🇸 美国 | USA 2
-  - 🇳🇱 荷兰 | NLD 7
-  - 🇷🇺 俄罗斯 | RUS 6
-  - 🇩🇪 德国 | DEU 2
-  - BR - zhuhai.uk
+  - US - zhuhai.uk 12
+  - US - zhuhai.uk 10
+  - VN - zhuhai.uk
   - 🇷🇺 俄罗斯 | RUS 4
-  - 🇳🇱 荷兰 | NLD 8
-  - DE - zhuhai.uk
-  - 🇨🇳 CN_87
   - 🇩🇪 德国 | DEU 7
   - 🇮🇹 意大利 | ITA 2
-  - 🇷🇺 俄罗斯 | RUS 2
   - 🇮🇹 意大利 | ITA 4
-  - 🇳🇱 荷兰 | NLD 10
-  - 🇳🇱 荷兰 | NLD 4
+  - 🇷🇺 俄罗斯 | RUS 2
+  - 🇸🇪 瑞典 | SWE 3
+  - FR - zhuhai.uk
+  - DK - zhuhai.uk
+  - RU - zhuhai.uk
   - 🇷🇺 俄罗斯 | RUS 3
-  - 🇷🇺 俄罗斯 | RUS 7
-  - 🇮🇹 意大利 | ITA 6
-  - 🇮🇹IT意大利丨yoyapai.com (12)
+  - 🇹🇼 🇨🇳 台湾 | TWN
+  - 🇮🇹IT意大利丨yoyapai.com (6)
   - 🇷🇺 俄罗斯 | RUS
-  - ❓未知丨yoyapai.com (9)
-  - AL - zhuhai.uk
-  - TH - zhuhai.uk 03
-  - NL - zhuhai.uk 03
-  - NL - zhuhai.uk
-  - DE - zhuhai.uk 01
-  - NL - zhuhai.uk 02
-  - 🇩🇪 德国 | DEU 6
+  - 🇮🇹IT意大利丨yoyapai.com
+  - 🇹🇷 土耳其 | TUR
   - 🇮🇹 意大利 | ITA
-  - 🇷🇺 俄罗斯 | RUS 5
-  - 🇮🇹 意大利 | ITA 5
+  - 🇩🇪 德国 | DEU 11
+  - 🇹🇼 🇨🇳 台湾 | TWN 2
+  - 🇵🇭 菲律宾 | PHL
+  - EC - zhuhai.uk
   - KR - zhuhai.uk
-  - TH - zhuhai.uk 02
-  - 🇬🇧 英国 | GBR 2
-  - 🇳🇱 荷兰 | NLD 6
-  - NL - zhuhai.uk 04
-  - 🇩🇪 德国 | DEU
-  - 🇪🇸 西班牙 | ESP 2
-  - TH - zhuhai.uk
-  - 🇳🇱 荷兰 | NLD 3
-  - LT - zhuhai.uk
-  - NL - zhuhai.uk 05
+  - ❓未知丨yoyapai.com (3)
+  - 🇩🇪 德国 | DEU 4
+  - ❓未知丨yoyapai.com (7)
   - ❓未知丨yoyapai.com (6)
-  - 🇳🇱 荷兰 | NLD 9
-  - 🇻🇳 越南 | VNM
-  - 🇬🇧 英国 | GBR
+  - ❓未知丨yoyapai.com (2)
+  - ID - zhuhai.uk
+  - xx|0291|puddincat07@Telegram
   - nl|3eaa|puddincat07@Telegram
   - 🇮🇹 意大利 | ITA 3
-  - 🇮🇹 意大利 | ITA 7
-  - 🇳🇱 荷兰 | NLD 5
-  - 🇪🇸 西班牙 | ESP
+  - DE - zhuhai.uk 02
+  - 🇩🇪 德国 | DEU 10
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: HK-POOL
   type: url-test
   proxies:
+  - 🇭🇰 香港 | HKG 3
   - 🇭🇰 香港 | HKG
   - HK - zhuhai.uk 02
   - HK - zhuhai.uk
@@ -946,8 +734,7 @@ proxy-groups:
   type: url-test
   proxies:
   - JP - zhuhai.uk 02
-  - 🇯🇵 日本 | JPN 2
-  - 🇯🇵JP日本丨yoyapai.com (2)
+  - 🇯🇵 日本 | JPN 4
   - JP - zhuhai.uk
   - 🇯🇵 日本 | JPN
   url: http://www.gstatic.com/generate_204
@@ -956,41 +743,40 @@ proxy-groups:
   type: url-test
   proxies:
   - US - zhuhai.uk 07
-  - 🇺🇸 美国 | USA 9
   - US - zhuhai.uk 03
   - 🇺🇸 美国 | USA 8
   - us|2abc|puddincat07@Telegram
+  - US - zhuhai.uk 08
   - 🇺🇸 美国 | USA 6
-  - 🇺🇸 美国 | USA 7
-  - US - zhuhai.uk 05
-  - 🇺🇸 美国 | USA 3
   - US - zhuhai.uk 04
-  - 🇺🇸 美国 | USA 4
+  - 🇺🇸 美国 | USA 3
+  - US - zhuhai.uk 05
   - 🇺🇸 美国 | USA 5
+  - US - zhuhai.uk 13
   - 🇺🇸 美国 | USA
   - US - zhuhai.uk 06
-  - 🇺🇸 美国 | USA 10
   - US - zhuhai.uk
   - US - zhuhai.uk 02
-  - 🇺🇸 美国 | USA 2
+  - US - zhuhai.uk 12
+  - US - zhuhai.uk 10
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: AI-POOL
   type: url-test
   proxies:
+  - 🇭🇰 香港 | HKG 3
   - 🇭🇰 香港 | HKG
   - HK - zhuhai.uk 02
   - HK - zhuhai.uk
   - JP - zhuhai.uk 02
-  - 🇯🇵 日本 | JPN 2
-  - 🇯🇵JP日本丨yoyapai.com (2)
+  - 🇯🇵 日本 | JPN 4
   - JP - zhuhai.uk
   - 🇯🇵 日本 | JPN
   - US - zhuhai.uk 07
-  - 🇺🇸 美国 | USA 9
   - US - zhuhai.uk 03
   - 🇺🇸 美国 | USA 8
   - us|2abc|puddincat07@Telegram
+  - US - zhuhai.uk 08
   url: http://www.gstatic.com/generate_204
   interval: 120
 - name: FALLBACK
